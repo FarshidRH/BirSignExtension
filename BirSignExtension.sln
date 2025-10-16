@@ -7,6 +7,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetFrameworkExtension", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{089100B1-113F-4E66-888A-E83F3999EAFD}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5D20AA90-6969-D8BD-9DCD-8634F4692FDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcNetFramework", "samples\MvcNetFramework\MvcNetFramework.csproj", "{C6362C4E-7192-450C-B402-86019729FE75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +27,17 @@ Global
 		{9B25A29C-937D-41C0-AB44-A90D4793AF04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B25A29C-937D-41C0-AB44-A90D4793AF04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B25A29C-937D-41C0-AB44-A90D4793AF04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6362C4E-7192-450C-B402-86019729FE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6362C4E-7192-450C-B402-86019729FE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6362C4E-7192-450C-B402-86019729FE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6362C4E-7192-450C-B402-86019729FE75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9B25A29C-937D-41C0-AB44-A90D4793AF04} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{C6362C4E-7192-450C-B402-86019729FE75} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA929340-9093-4586-BF61-99D65D2E99CB}

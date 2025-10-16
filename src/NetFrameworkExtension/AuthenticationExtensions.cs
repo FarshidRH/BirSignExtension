@@ -1,5 +1,5 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Dtos;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Integration.Options;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -15,9 +15,9 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
 {
     public static class AuthenticationExtensions
     {
-        public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app, AuthenticationOptions options)
+        public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app, BirSignAuthenticationOptions options)
         {
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
             {
                 AuthenticationType = options.AuthenticationType,
                 ClientId = options.ClientId,
