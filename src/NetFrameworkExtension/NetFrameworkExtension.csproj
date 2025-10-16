@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationExtensions.cs" />
+    <Compile Include="Constants\BirSignConstants.cs" />
     <Compile Include="Dtos\RoleRequest.cs" />
     <Compile Include="Dtos\ApiReponse.cs" />
     <Compile Include="Dtos\RoleInfo.cs" />

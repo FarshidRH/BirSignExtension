@@ -1,10 +1,10 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Dtos;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Events;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Options;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security;
 using MvcNetFramework.Constants;
 using MvcNetFramework.Models;
@@ -25,34 +25,19 @@ namespace MvcNetFramework
             => HttpContext.Current.GetOwinContext().Authentication;
 
         public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app)
-        {
-            return app.UseBirSignAuthentication(new BirSignAuthenticationOptions()
-            {
-                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                ClientId = IdsConstants.IdsClientId,
-                Authority = IdsConstants.IdsServerUrl,
-                RedirectUri = "https://localhost:44331/Home/Index",
-                PostLogoutRedirectUri = "https://localhost:44331/Home/Index",
-                ClientSecret = IdsConstants.IdsClientSecretNotHashed,
-                ResponseType = "id_token",
-                Scope = "openid profile",
-                UseTokenLifetime = false,
-                RequireHttpsMetadata = false,
-                SaveTokens = true,
-                TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                },
-                Events = new IdsEvents
+            => app.UseBirSignAuthentication(new BirSignAuthenticationOptions(
+                clientId: IdsConstants.IdsClientId,
+                clientSecret: IdsConstants.IdsClientSecret,
+                authority: IdsConstants.IdsServerUrl,
+                redirectUri: "https://localhost:44331/Home/Index",
+                postLogoutRedirectUri: "https://localhost:44331/Home/Index",
+                events: new IdsEvents
                 {
                     OnCheckUserExists = OnCheckUserExists,
                     OnUserRegistered = OnUserRegistered,
                     OnManageUserAccess = OnManageUserAccess,
                     OnUserAuthenticated = OnUserAuthenticated,
-                }
-            });
-        }
+                }));
 
         private static async Task<bool> OnCheckUserExists(UserInfo userInfo)
             => await UserManager.FindByNameAsync(userInfo.NationalCode) != null;
@@ -102,13 +87,16 @@ namespace MvcNetFramework
                 return;
             }
 
-            var userIdentity = UserManager.CreateIdentity(user, DefaultAuthenticationTypes.ApplicationCookie);
+            var userIdentity = UserManager.CreateIdentity(user, BirSignConstants.AuthenticationType);
             userIdentity.AddClaims(userInfo.Identity.Claims.Where(p => p.Type == "sid"));
 
             var authenticationTypes = new string[]
             {
                 DefaultAuthenticationTypes.ApplicationCookie,
-                DefaultAuthenticationTypes.ExternalCookie
+                DefaultAuthenticationTypes.ExternalCookie,
+                DefaultAuthenticationTypes.TwoFactorCookie,
+                DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie,
+                BirSignConstants.AuthenticationType,
             };
             AuthenticationManager.SignOut(authenticationTypes);
 

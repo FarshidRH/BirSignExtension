@@ -1,4 +1,5 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -46,16 +47,6 @@ namespace MvcNetFramework.Controllers
         {
             get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             private set => _userManager = value;
-        }
-
-        //
-        // GET: /Account/BirSignin
-        [AllowAnonymous]
-        public ActionResult BirSignin(string returnUrl)
-        {
-            var authenticationProperties = new AuthenticationProperties { RedirectUri = returnUrl, };
-            AuthenticationManager.Challenge(authenticationProperties, DefaultAuthenticationTypes.ApplicationCookie);
-            return new HttpUnauthorizedResult();
         }
 
         //
@@ -436,7 +427,7 @@ namespace MvcNetFramework.Controllers
                     return new HttpStatusCodeResult(500, $"Logout failed: {ex.Message}");
                 }
 
-                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                AuthenticationManager.SignOut(BirSignConstants.AuthenticationType);
                 Session.Abandon();
             }
 
