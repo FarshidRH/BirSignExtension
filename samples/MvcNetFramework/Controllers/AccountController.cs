@@ -50,16 +50,6 @@ namespace MvcNetFramework.Controllers
         }
 
         //
-        // GET: /Account/BirSignin
-        [AllowAnonymous]
-        public ActionResult BirSignin(string returnUrl)
-        {
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("ManageAuth", "Home") };
-            HttpContext.GetOwinContext().Authentication.Challenge(properties, BirSignConstants.AuthenticationType);
-            return new HttpUnauthorizedResult();
-        }
-
-        //
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)

@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using MvcNetFramework.Constants;
 using MvcNetFramework.Models;
 using MvcNetFramework.Models.DbContext;
 using Owin;
@@ -26,7 +27,7 @@ namespace MvcNetFramework
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString("/Account/Login"),
+                LoginPath = new PathString(IdsConstants.IdsLoginUrl),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.

@@ -11,6 +11,7 @@ namespace MvcNetFramework.Constants
         public static string IdsClientSecret = Sha256_hash(IdsClientSecretNotHashed);
         public static string IdsServerUrl = "https://sso.urmia.ir";
         public static string ApisServerUrl = "https://ssoapi.urmia.ir";
+        public static string IdsLoginUrl = "/BirSign/Login";
 
         public static String Sha256_hash(String input)
         {

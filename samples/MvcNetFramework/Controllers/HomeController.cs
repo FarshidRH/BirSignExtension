@@ -59,6 +59,7 @@ namespace MvcNetFramework.Controllers
             return View(user);
         }
 
+        [Authorize]
         public async Task<ActionResult> SendRoles()
         {
             var roles = await RoleManager.Roles
@@ -75,12 +76,6 @@ namespace MvcNetFramework.Controllers
 
             var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles });
             return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpGet]
-        public ActionResult ManageAuth()
-        {
-            return RedirectToAction("Index");
         }
 
         public ActionResult About()

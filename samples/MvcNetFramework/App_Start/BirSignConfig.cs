@@ -29,7 +29,7 @@ namespace MvcNetFramework
                 clientId: IdsConstants.IdsClientId,
                 clientSecret: IdsConstants.IdsClientSecret,
                 authority: IdsConstants.IdsServerUrl,
-                redirectUri: "https://localhost:44331/Home/ManageAuth",
+                redirectUri: "https://localhost:44331",
                 postLogoutRedirectUri: "https://localhost:44331",
                 events: new IdsEvents
                 {
@@ -61,7 +61,7 @@ namespace MvcNetFramework
                 UserName = userInfo.NationalCode
             };
             UserManager.Create(user);
-            UserManager.AddPassword(user.Id, "$trongP@ssW0rd");
+            UserManager.AddPassword(user.Id, $"{user.NationalCode}@Fava");
         }
 
         private static async Task OnManageUserAccess(UserInfo userInfo)

@@ -27,7 +27,7 @@
                     Name = "User",
                     IsPublicAccess = true,
                     IsPersonnelAccess = true,
-                    Description = "This is use role."
+                    Description = "This is user role."
                 });
         }
     }

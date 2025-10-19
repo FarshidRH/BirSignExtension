@@ -39,6 +39,8 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Options
                 ValidateIssuer = true,
                 ValidateAudience = true,
             };
+
+            StaticRedirectUri = redirectUri;
         }
 
         public string ClientId { get; private set; }
@@ -66,5 +68,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Options
         public IdsEvents Events { get; set; }
 
         public TokenValidationParameters TokenValidationParameters { get; set; }
+
+        internal static string StaticRedirectUri { get; set; }
     }
 }
