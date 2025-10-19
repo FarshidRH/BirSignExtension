@@ -2,7 +2,7 @@
 {
     public class BirSignConstants
     {
-        public const string AuthenticationType = "BirSign";
+        public const string AuthenticationType = "ApplicationCookie";
         public const string ResponseType = "id_token";
         public const string Scope = "openid profile";
     }

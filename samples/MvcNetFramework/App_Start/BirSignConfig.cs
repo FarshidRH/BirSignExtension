@@ -29,8 +29,8 @@ namespace MvcNetFramework
                 clientId: IdsConstants.IdsClientId,
                 clientSecret: IdsConstants.IdsClientSecret,
                 authority: IdsConstants.IdsServerUrl,
-                redirectUri: "https://localhost:44331/Home/Index",
-                postLogoutRedirectUri: "https://localhost:44331/Home/Index",
+                redirectUri: "https://localhost:44331/Home/ManageAuth",
+                postLogoutRedirectUri: "https://localhost:44331",
                 events: new IdsEvents
                 {
                     OnCheckUserExists = OnCheckUserExists,
