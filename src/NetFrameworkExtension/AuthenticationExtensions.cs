@@ -15,9 +15,25 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
 {
     public static class AuthenticationExtensions
     {
-        public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app, BirSignAuthenticationOptions options)
+        public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app)
         {
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
+            var options = new BirSignAuthenticationOptions();
+            return app.UseBirSignAuthentication(options);
+        }
+
+        public static IAppBuilder UseBirSignAuthentication(this IAppBuilder app,
+            Action<BirSignAuthenticationOptions> optionsAction)
+        {
+            var options = new BirSignAuthenticationOptions();
+            optionsAction(options);
+
+            return app.UseBirSignAuthentication(options);
+        }
+
+        private static IAppBuilder UseBirSignAuthentication(this IAppBuilder app,
+            BirSignAuthenticationOptions options)
+        {
+            return app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
             {
                 AuthenticationType = options.AuthenticationType,
                 ClientId = options.ClientId,
@@ -80,8 +96,6 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                     }
                 }
             });
-
-            return app;
         }
 
         private static byte[] Base64UrlDecode(string input)

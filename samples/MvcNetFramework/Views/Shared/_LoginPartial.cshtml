@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNet.Identity
 @using MvcNetFramework.Extensions
+@using MapIdeaHub.BirSign.NetFrameworkExtension.Constants
 
 @if (Request.IsAuthenticated)
 {
@@ -17,9 +18,9 @@
 }
 else
 {
-<ul class="navbar-nav navbar-right">
-    <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "nav-link" })</li>
-    <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "nav-link" })</li>
-    <li>@Html.ActionLink("BirSign in", "Login", "BirSign", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "nav-link" })</li>
-</ul>
+    <ul class="navbar-nav navbar-right">
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "nav-link" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "nav-link" })</li>
+        <li><a class="nav-link" id="loginLink" href="@BirSignConstants.LoginUri">BirSign in</a></li>
+    </ul>
 }

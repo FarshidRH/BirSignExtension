@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Events;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using MvcNetFramework.Constants;
+using MvcNetFramework.Helpers;
 using MvcNetFramework.Models;
 using MvcNetFramework.Models.DbContext;
 using Owin;
@@ -27,7 +30,7 @@ namespace MvcNetFramework
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString(IdsConstants.IdsLoginUrl),
+                LoginPath = new PathString(BirSignConstants.LoginUri),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.
@@ -48,7 +51,16 @@ namespace MvcNetFramework
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // Uncomment the following lines to enable logging in with third party login providers
-            app.UseBirSignAuthentication();
+            app.UseBirSignAuthentication(options =>
+            {
+                options.Events = new IdsEvents
+                {
+                    OnCheckUserExists = IdsHelper.OnCheckUserExists,
+                    OnUserRegistered = IdsHelper.OnUserRegistered,
+                    OnManageUserAccess = IdsHelper.OnManageUserAccess,
+                    OnUserAuthenticated = IdsHelper.OnUserAuthenticated,
+                };
+            });
 
             //app.UseMicrosoftAccountAuthentication(
             //    clientId: "",

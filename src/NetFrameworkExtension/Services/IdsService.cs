@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,14 +18,20 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Services
         private readonly string _clientId;
         private readonly string _clientSecretNotHashed;
 
+        public IdsService() : this(
+            ConfigurationManager.AppSettings["BirSignIdsUri"],
+            ConfigurationManager.AppSettings["BirSignApiUri"],
+            ConfigurationManager.AppSettings["BirSignClientId"],
+            ConfigurationManager.AppSettings["BirSignClientSecret"])
+        { }
+
         public IdsService(
             string identityServerUrl,
             string apiServerUrl,
             string clientId,
             string clientSecretNotHashed)
             : this(new HttpClient(), identityServerUrl, apiServerUrl, clientId, clientSecretNotHashed)
-        {
-        }
+        { }
 
         public IdsService(
             HttpClient httpClient,

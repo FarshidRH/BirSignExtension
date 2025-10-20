@@ -3,9 +3,9 @@ using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using MvcNetFramework.Constants;
 using MvcNetFramework.Models;
 using System;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,11 +22,7 @@ namespace MvcNetFramework.Controllers
 
         public AccountController()
         {
-            _idsService = new IdsService(
-                IdsConstants.IdsServerUrl,
-                IdsConstants.ApisServerUrl,
-                IdsConstants.IdsClientId,
-                IdsConstants.IdsClientSecret);
+            _idsService = new IdsService();
         }
 
         public AccountController(
@@ -419,7 +415,8 @@ namespace MvcNetFramework.Controllers
 
                 try
                 {
-                    var logoutUri = $"{IdsConstants.IdsServerUrl}/api/logout/process";
+                    string birSignIdsUri = ConfigurationManager.AppSettings["BirSignIdsUri"];
+                    var logoutUri = $"{birSignIdsUri}/api/logout/process";
                     await _idsService.LogoutAsync(logoutToken, logoutUri);
                 }
                 catch (Exception ex)

@@ -1,7 +1,6 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Dtos;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
 using Microsoft.AspNet.Identity.Owin;
-using MvcNetFramework.Constants;
 using MvcNetFramework.Models;
 using System.Data.Entity;
 using System.Linq;
@@ -19,11 +18,7 @@ namespace MvcNetFramework.Controllers
 
         public HomeController()
         {
-            _idsService = new IdsService(
-                IdsConstants.IdsServerUrl,
-                IdsConstants.ApisServerUrl,
-                IdsConstants.IdsClientId,
-                IdsConstants.IdsClientSecretNotHashed);
+            _idsService = new IdsService();
         }
 
         public HomeController(

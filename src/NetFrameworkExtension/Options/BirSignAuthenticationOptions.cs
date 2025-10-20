@@ -1,57 +1,45 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Enums;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Events;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Utilities;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
 
 namespace MapIdeaHub.BirSign.NetFrameworkExtension.Options
 {
     public class BirSignAuthenticationOptions
     {
-        public BirSignAuthenticationOptions(
-            string clientId,
-            string clientSecret,
-            string authority,
-            string redirectUri,
-            string postLogoutRedirectUri,
-            string authenticationType = BirSignConstants.AuthenticationType,
-            string responseType = BirSignConstants.ResponseType,
-            string scope = BirSignConstants.Scope,
-            bool useTokenLifetime = false,
-            bool requireHttpsMetadata = false,
-            bool saveTokens = true,
-            IdsEvents events = null,
-            TokenValidationParameters tokenValidationParameters = null)
+        internal BirSignAuthenticationOptions()
         {
-            ClientId = clientId;
-            ClientSecret = clientSecret;
-            Authority = authority;
-            RedirectUri = redirectUri;
-            PostLogoutRedirectUri = postLogoutRedirectUri;
-            AuthenticationType = authenticationType;
-            ResponseType = responseType;
-            Scope = scope;
-            UseTokenLifetime = useTokenLifetime;
-            RequireHttpsMetadata = requireHttpsMetadata;
-            SaveTokens = saveTokens;
-            Events = events;
-
-            TokenValidationParameters = tokenValidationParameters ?? new TokenValidationParameters
+            ClientId = ConfigurationManager.AppSettings["BirSignClientId"];
+            ClientSecret = ConfigurationManager.AppSettings["BirSignClientSecret"].ComputeHash(HashType.SHA256);
+            Authority = ConfigurationManager.AppSettings["BirSignIdsUri"];
+            RedirectUri = ConfigurationManager.AppSettings["BirSignRedirectUri"];
+            PostLogoutRedirectUri = ConfigurationManager.AppSettings["BirSignPostLogoutRedirectUri"];
+            AuthenticationType = BirSignConstants.AuthenticationType;
+            ResponseType = BirSignConstants.ResponseType;
+            Scope = BirSignConstants.Scope;
+            UseTokenLifetime = false;
+            RequireHttpsMetadata = false;
+            SaveTokens = true;
+            TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
             };
-
-            StaticRedirectUri = redirectUri;
+            Events = null;
+            StaticRedirectUri = RedirectUri;
         }
 
-        public string ClientId { get; private set; }
+        public string ClientId { get; set; }
 
-        public string ClientSecret { get; private set; }
+        public string ClientSecret { get; set; }
 
-        public string Authority { get; private set; }
+        public string Authority { get; set; }
 
-        public string RedirectUri { get; private set; }
+        public string RedirectUri { get; set; }
 
-        public string PostLogoutRedirectUri { get; private set; }
+        public string PostLogoutRedirectUri { get; set; }
 
         public string AuthenticationType { get; set; }
 
@@ -65,10 +53,10 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Options
 
         public bool SaveTokens { get; set; }
 
-        public IdsEvents Events { get; set; }
-
         public TokenValidationParameters TokenValidationParameters { get; set; }
 
-        internal static string StaticRedirectUri { get; set; }
+        public IdsEvents Events { get; set; }
+
+        internal static string StaticRedirectUri;
     }
 }
