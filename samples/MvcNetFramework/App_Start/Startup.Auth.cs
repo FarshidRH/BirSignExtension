@@ -30,7 +30,7 @@ namespace MvcNetFramework
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString(BirSignConstants.LoginUri),
+                LoginPath = new PathString(BirSignConstants.IsUseBirSign ? BirSignConstants.LoginUri : "/Account/Login"),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.
@@ -51,16 +51,19 @@ namespace MvcNetFramework
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // Uncomment the following lines to enable logging in with third party login providers
-            app.UseBirSignAuthentication(options =>
+            if (BirSignConstants.IsUseBirSign)
             {
-                options.Events = new IdsEvents
+                app.UseBirSignAuthentication(options =>
                 {
-                    OnCheckUserExists = IdsHelper.OnCheckUserExists,
-                    OnUserRegistered = IdsHelper.OnUserRegistered,
-                    OnManageUserAccess = IdsHelper.OnManageUserAccess,
-                    OnUserAuthenticated = IdsHelper.OnUserAuthenticated,
-                };
-            });
+                    options.Events = new IdsEvents
+                    {
+                        OnCheckUserExists = IdsHelper.OnCheckUserExists,
+                        OnUserRegistered = IdsHelper.OnUserRegistered,
+                        OnManageUserAccess = IdsHelper.OnManageUserAccess,
+                        OnUserAuthenticated = IdsHelper.OnUserAuthenticated,
+                    };
+                });
+            }
 
             //app.UseMicrosoftAccountAuthentication(
             //    clientId: "",

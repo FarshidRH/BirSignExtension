@@ -50,6 +50,11 @@ namespace MvcNetFramework.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            if (BirSignConstants.IsUseBirSign)
+            {
+                return Redirect(BirSignConstants.LoginUri);
+            }
+
             ViewBag.ReturnUrl = returnUrl;
             return View(new LoginViewModel());
         }
@@ -61,6 +66,11 @@ namespace MvcNetFramework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            if (BirSignConstants.IsUseBirSign)
+            {
+                return Redirect(BirSignConstants.LoginUri);
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
