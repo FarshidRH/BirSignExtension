@@ -1,11 +1,8 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using MvcNetFramework.Models;
-using System;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -16,18 +13,14 @@ namespace MvcNetFramework.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly IdsService _idsService;
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
-        public AccountController()
-        {
-            _idsService = new IdsService();
-        }
+        public AccountController() { }
 
         public AccountController(
             ApplicationUserManager userManager,
-            ApplicationSignInManager signInManager) : this()
+            ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -410,35 +403,6 @@ namespace MvcNetFramework.Controllers
         public ActionResult ExternalLoginFailure()
         {
             return View();
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> SignoutOidc()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                var logoutToken = Request.Form["logout_token"];
-                if (string.IsNullOrEmpty(logoutToken))
-                {
-                    return new HttpStatusCodeResult(400, "Logout token is missing.");
-                }
-
-                try
-                {
-                    string birSignIdsUri = ConfigurationManager.AppSettings["BirSignIdsUri"];
-                    var logoutUri = $"{birSignIdsUri}/api/logout/process";
-                    await _idsService.LogoutAsync(logoutToken, logoutUri);
-                }
-                catch (Exception ex)
-                {
-                    return new HttpStatusCodeResult(500, $"Logout failed: {ex.Message}");
-                }
-
-                AuthenticationManager.SignOut(BirSignConstants.AuthenticationType);
-                Session.Abandon();
-            }
-
-            return new HttpStatusCodeResult(200);
         }
 
         protected override void Dispose(bool disposing)

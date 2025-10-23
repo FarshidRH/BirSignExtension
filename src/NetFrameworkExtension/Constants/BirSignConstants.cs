@@ -9,6 +9,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Constants
         public const string ResponseType = "id_token";
         public const string Scope = "openid profile";
         public const string LoginUri = "/BirSign/Login";
+        public const string LogoutUri = "/BirSign/Logout";
 
         public static bool IsUseBirSign =
             ConfigurationManager.AppSettings["IsUseBirSign"] != null &&
