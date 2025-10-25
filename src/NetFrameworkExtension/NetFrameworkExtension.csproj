@@ -164,10 +164,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="_01-nuget-spec.bat" />
-    <None Include="_02-nuget-pack.bat" />
+    <None Include="scripts\nuget\_01-nuget-spec.bat" />
+    <None Include="scripts\nuget\_02-nuget-pack.bat" />
     <None Include="packages.config" />
-    <None Include="_03-nuget-add.bat" />
+    <None Include="scripts\nuget\_03-nuget-add.bat" />
+    <None Include="scripts\nuget\_04-nuget-push.bat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
