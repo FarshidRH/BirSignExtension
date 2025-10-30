@@ -33,7 +33,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
         private static IAppBuilder UseBirSignAuthentication(this IAppBuilder app,
             BirSignAuthenticationOptions options)
         {
-            return app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
+            var appBuilder = app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
             {
                 AuthenticationType = options.AuthenticationType,
                 ClientId = options.ClientId,
@@ -96,6 +96,11 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                     }
                 }
             });
+
+            BirSignAuthenticationOptions._staticIdsUri = options.Authority;
+            BirSignAuthenticationOptions._staticRedirectUri = options.RedirectUri;
+
+            return appBuilder;
         }
 
         private static byte[] Base64UrlDecode(string input)

@@ -22,20 +22,19 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Controllers
             _idsService = new IdsService();
         }
 
-        //
-        // GET: /BirSign/Login
         [AllowAnonymous]
         public ActionResult Login()
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = BirSignAuthenticationOptions.StaticRedirectUri,
+                RedirectUri = BirSignAuthenticationOptions._staticRedirectUri,
             };
             HttpContext.GetOwinContext().Authentication.Challenge(properties, BirSignConstants.AuthenticationType);
             return new HttpUnauthorizedResult();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Logout()
         {
             if (User.Identity.IsAuthenticated)
@@ -63,6 +62,5 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Controllers
 
             return new HttpStatusCodeResult(200);
         }
-
     }
 }

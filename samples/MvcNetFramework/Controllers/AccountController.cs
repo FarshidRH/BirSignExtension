@@ -135,6 +135,11 @@ namespace MvcNetFramework.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            if (BirSignConstants.IsUseBirSign)
+            {
+                return Redirect(BirSignConstants.RegisterUri);
+            }
+
             return View(new RegisterViewModel());
         }
 
@@ -145,6 +150,11 @@ namespace MvcNetFramework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            if (BirSignConstants.IsUseBirSign)
+            {
+                return Redirect(BirSignConstants.RegisterUri);
+            }
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser

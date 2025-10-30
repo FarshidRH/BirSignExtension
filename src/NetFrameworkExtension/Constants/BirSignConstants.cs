@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Options;
+using System;
 using System.Configuration;
 
 namespace MapIdeaHub.BirSign.NetFrameworkExtension.Constants
@@ -10,6 +11,8 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Constants
         public const string Scope = "openid profile";
         public const string LoginUri = "/BirSign/Login";
         public const string LogoutUri = "/BirSign/Logout";
+
+        public static string RegisterUri => $"{BirSignAuthenticationOptions._staticIdsUri}/Account/Register";
 
         public static bool IsUseBirSign =
             ConfigurationManager.AppSettings["IsUseBirSign"] != null &&
