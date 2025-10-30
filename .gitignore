@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+/src/NetFrameworkExtension/scripts/nuget/_04-nuget-push.bat
