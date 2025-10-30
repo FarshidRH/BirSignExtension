@@ -1,6 +1,6 @@
 ﻿namespace MvcNetFramework.Migrations
 {
-    using MvcNetFramework.Models;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using MvcNetFramework.Models.DbContext;
     using System.Data.Entity.Migrations;
 
@@ -16,19 +16,9 @@
         {
             base.Seed(context);
 
-            context.Set<ApplicationRole>().AddOrUpdate(x => x.Name,
-                new ApplicationRole
-                {
-                    Name = "Admin",
-                    Description = "This is admin role."
-                },
-                new ApplicationRole
-                {
-                    Name = "User",
-                    IsPublicAccess = true,
-                    IsPersonnelAccess = true,
-                    Description = "This is user role."
-                });
+            context.Set<IdentityRole>().AddOrUpdate(x => x.Name,
+                new IdentityRole { Name = "Admin" },
+                new IdentityRole { Name = "User" });
         }
     }
 }

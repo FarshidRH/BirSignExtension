@@ -41,7 +41,7 @@ namespace MvcNetFramework.Helpers
                 UserName = userInfo.NationalCode
             };
             UserManager.Create(user);
-            UserManager.AddPassword(user.Id, $"{user.NationalCode}@Fava");
+            UserManager.AddPassword(user.Id, Guid.NewGuid().ToString());
         }
 
         public static async Task OnManageUserAccess(UserInfo userInfo)

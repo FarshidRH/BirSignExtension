@@ -86,16 +86,16 @@ namespace MvcNetFramework
     }
 
     // Configure the application role manager which is used in this application.
-    public class ApplicationRoleManager : RoleManager<ApplicationRole, string>
+    public class ApplicationRoleManager : RoleManager<IdentityRole, string>
     {
-        public ApplicationRoleManager(IRoleStore<ApplicationRole, string> store)
+        public ApplicationRoleManager(IRoleStore<IdentityRole, string> store)
             : base(store)
         {
         }
 
         public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
         {
-            return new ApplicationRoleManager(new RoleStore<ApplicationRole>(context.Get<ApplicationDbContext>()));
+            return new ApplicationRoleManager(new RoleStore<IdentityRole>(context.Get<ApplicationDbContext>()));
         }
     }
 

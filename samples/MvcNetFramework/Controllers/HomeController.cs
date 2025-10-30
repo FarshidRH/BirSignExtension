@@ -2,6 +2,7 @@
 using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
 using Microsoft.AspNet.Identity.Owin;
 using MvcNetFramework.Models;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace MvcNetFramework.Controllers
             return View(user);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> SendRoles()
         {
             var roles = await RoleManager.Roles
@@ -63,11 +64,27 @@ namespace MvcNetFramework.Controllers
                 {
                     Name = x.Name,
                     SourcePrimaryKey = x.Id,
-                    IsPublicForAll = x.IsPublicAccess,
-                    IsPublicForOrganUsers = x.IsPersonnelAccess,
-                    Description = x.Description,
                 })
                 .ToListAsync();
+
+            foreach (var role in roles)
+            {
+                switch (role.Name)
+                {
+                    case "Admin":
+                        role.IsPublicForAll = false;
+                        role.IsPublicForOrganUsers = false;
+                        role.Description = "دسترسی ادمین برای مدیریت کامل سیستم";
+                        break;
+                    case "User":
+                        role.IsPublicForAll = true;
+                        role.IsPublicForOrganUsers = false;
+                        role.Description = "دسترسی عمومی برای کاربران عادی سامانه";
+                        break;
+                    default:
+                        throw new NotImplementedException($"The role of '{role.Name}' is not defined in the system.");
+                }
+            }
 
             var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles });
             return Json(result, JsonRequestBehavior.AllowGet);

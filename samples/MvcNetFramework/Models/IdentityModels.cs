@@ -26,13 +26,4 @@ namespace MvcNetFramework.Models
             return userIdentity;
         }
     }
-
-    public class ApplicationRole : IdentityRole
-    {
-        public bool IsPublicAccess { get; set; }
-
-        public bool IsPersonnelAccess { get; set; }
-
-        public string Description { get; set; }
-    }
 }

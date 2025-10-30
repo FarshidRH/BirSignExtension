@@ -231,10 +231,6 @@
     <Compile Include="Migrations\202510150641328_AddPropsToUser.Designer.cs">
       <DependentUpon>202510150641328_AddPropsToUser.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202510150914459_AddPropsToRole.cs" />
-    <Compile Include="Migrations\202510150914459_AddPropsToRole.Designer.cs">
-      <DependentUpon>202510150914459_AddPropsToRole.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -357,9 +353,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202510150641328_AddPropsToUser.resx">
       <DependentUpon>202510150641328_AddPropsToUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510150914459_AddPropsToRole.resx">
-      <DependentUpon>202510150914459_AddPropsToRole.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
