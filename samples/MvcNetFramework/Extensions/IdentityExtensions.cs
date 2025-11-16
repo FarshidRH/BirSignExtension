@@ -2,7 +2,6 @@
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace MvcNetFramework.Extensions
@@ -17,7 +16,7 @@ namespace MvcNetFramework.Extensions
             }
 
             var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            var user = userManager.FindByName(identity.GetUserName());
+            var user = userManager.FindByName(identity.Name);
             return user != null ? $"{user.Name} {user.Family}" : string.Empty;
         }
     }

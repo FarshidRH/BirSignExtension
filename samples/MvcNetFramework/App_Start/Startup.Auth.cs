@@ -1,13 +1,13 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Events;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using MvcNetFramework.Helpers;
+using Microsoft.Owin.Security.OpenIdConnect;
 using MvcNetFramework.Models;
 using MvcNetFramework.Models.DbContext;
+using MvcNetFramework.Services;
 using Owin;
 using System;
 
@@ -51,16 +51,21 @@ namespace MvcNetFramework
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // Uncomment the following lines to enable logging in with third party login providers
+
             if (BirSignConstants.IsUseBirSign)
             {
                 app.UseBirSignAuthentication(options =>
                 {
-                    options.Events = new IdsEvents
+                    options.Notifications = new OpenIdConnectAuthenticationNotifications
                     {
-                        OnCheckUserExists = IdsHelper.OnCheckUserExists,
-                        OnUserRegistered = IdsHelper.OnUserRegistered,
-                        OnManageUserAccess = IdsHelper.OnManageUserAccess,
-                        OnUserAuthenticated = IdsHelper.OnUserAuthenticated,
+                        SecurityTokenValidated = async n =>
+                        {
+                            var identity = n.AuthenticationTicket.Identity;
+
+                            var userService = new UserService();
+                            await userService.EnsureUserExistsAsync(identity);
+                            await userService.ManageUserRolesAsync(identity);
+                        }
                     };
                 });
             }

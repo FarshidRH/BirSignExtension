@@ -355,7 +355,7 @@ namespace MvcNetFramework.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel());
             }
         }
 
@@ -379,7 +379,13 @@ namespace MvcNetFramework.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    Name = model.Name,
+                    Family = model.Family,
+                    NationalCode = model.NationalCode,
+                    UserName = model.NationalCode,
+                };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -400,9 +406,20 @@ namespace MvcNetFramework.Controllers
         //
         // POST: /Account/LogOff
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
+            if (BirSignConstants.IsUseBirSign)
+            {
+                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+                AuthenticationManager.SignOut(
+                    new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") },
+                    BirSignConstants.AuthenticationType);
+
+                return new EmptyResult();
+            }
+
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }

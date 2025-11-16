@@ -18,11 +18,22 @@
             Please enter a user name for this site below and click the Register button to finish
             logging in.
         </p>
-        <div class="row">
-            @Html.LabelFor(m => m.Email, new { @class = "col-md-2 col-form-label" })
+        <div class="row mb-2">
+            @Html.LabelFor(m => m.Name, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="row mb-2">
+            @Html.LabelFor(m => m.Family, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Family, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="row mb-2">
+            @Html.LabelFor(m => m.NationalCode, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.NationalCode, new { @class = "form-control" })
             </div>
         </div>
         <div class="row">

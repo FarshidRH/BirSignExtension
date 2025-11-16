@@ -6,9 +6,15 @@ namespace MvcNetFramework.Models
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Display(Name = "Family")]
+        public string Family { get; set; }
+
+        [Required]
+        [Display(Name = "National Code")]
+        public string NationalCode { get; set; }
     }
 
     public class ExternalLoginListViewModel

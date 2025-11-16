@@ -1,10 +1,5 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Dtos;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
-using Microsoft.AspNet.Identity.Owin;
+﻿using Microsoft.AspNet.Identity.Owin;
 using MvcNetFramework.Models;
-using System;
-using System.Data.Entity;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -13,33 +8,22 @@ namespace MvcNetFramework.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IdsService _idsService;
         private ApplicationUserManager _userManager;
-        private ApplicationRoleManager _roleManager;
 
         public HomeController()
         {
-            _idsService = new IdsService();
         }
 
         public HomeController(
-            ApplicationUserManager userManager,
-            ApplicationRoleManager roleManager) : this()
+            ApplicationUserManager userManager) : this()
         {
             UserManager = userManager;
-            RoleManager = roleManager;
         }
 
         public ApplicationUserManager UserManager
         {
             get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             private set => _userManager = value;
-        }
-
-        public ApplicationRoleManager RoleManager
-        {
-            get => _roleManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationRoleManager>();
-            private set => _roleManager = value;
         }
 
         public async Task<ActionResult> Index()
@@ -53,41 +37,6 @@ namespace MvcNetFramework.Controllers
             }
 
             return View(user);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> SendRoles()
-        {
-            var roles = await RoleManager.Roles
-                .AsNoTracking()
-                .Select(x => new RoleInfo
-                {
-                    Name = x.Name,
-                    SourcePrimaryKey = x.Id,
-                })
-                .ToListAsync();
-
-            foreach (var role in roles)
-            {
-                switch (role.Name)
-                {
-                    case "Admin":
-                        role.IsPublicForAll = false;
-                        role.IsPublicForOrganUsers = false;
-                        role.Description = "دسترسی ادمین برای مدیریت کامل سیستم";
-                        break;
-                    case "User":
-                        role.IsPublicForAll = true;
-                        role.IsPublicForOrganUsers = false;
-                        role.Description = "دسترسی عمومی برای کاربران عادی سامانه";
-                        break;
-                    default:
-                        throw new NotImplementedException($"The role of '{role.Name}' is not defined in the system.");
-                }
-            }
-
-            var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles });
-            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult About()
@@ -112,12 +61,6 @@ namespace MvcNetFramework.Controllers
                 {
                     _userManager.Dispose();
                     _userManager = null;
-                }
-
-                if (_roleManager != null)
-                {
-                    _roleManager.Dispose();
-                    _roleManager = null;
                 }
 
                 base.Dispose(disposing);
