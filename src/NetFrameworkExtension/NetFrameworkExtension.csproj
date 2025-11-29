@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NetFrameworkExtension.nuspec" />
     <None Include="README.md" />
     <None Include="scripts\nuget\_01-nuget-spec.bat" />
     <None Include="scripts\nuget\_02-nuget-pack.bat" />
