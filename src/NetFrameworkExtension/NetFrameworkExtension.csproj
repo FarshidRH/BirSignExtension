@@ -162,7 +162,7 @@
     <None Include="scripts\nuget\_01-nuget-spec.bat" />
     <None Include="scripts\nuget\_02-nuget-pack.bat" />
     <None Include="packages.config" />
-    <None Include="scripts\nuget\_03-nuget-add.bat" />
+    <None Include="scripts\nuget\_03-nuget-local.bat" />
     <None Include="scripts\nuget\_04-nuget-push.bat" />
   </ItemGroup>
   <ItemGroup>
