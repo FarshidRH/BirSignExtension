@@ -53,17 +53,9 @@ namespace MvcNetFramework
 
             if (BirSignSettings.IsUseBirSign)
             {
-                app.UseBirSignAuthentication(options =>
-                {
-                    options.Notifications.SecurityTokenValidated = async n =>
-                    {
-                        var identity = n.AuthenticationTicket.Identity;
-
-                        var userService = new UserService();
-                        await userService.EnsureUserExistsAsync(identity);
-                        await userService.ManageUserRolesAsync(identity);
-                    };
-                });
+                app.UseBirSignAuthentication(
+                    manageUser: UserHelper.EnsureUserExistsAsync,
+                    optionsConfigurator: null);
             }
 
             //app.UseMicrosoftAccountAuthentication(

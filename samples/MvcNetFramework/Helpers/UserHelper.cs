@@ -7,14 +7,12 @@ using System.Web;
 
 namespace MvcNetFramework.Services
 {
-    public class UserService
+    public class UserHelper
     {
-        private static ApplicationUserManager UserManager
-          => HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
-
-        public async Task EnsureUserExistsAsync(ClaimsIdentity identity)
+        public static async Task EnsureUserExistsAsync(ClaimsIdentity identity)
         {
-            ApplicationUser user = await UserManager.FindByNameAsync(identity.Name);
+            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            ApplicationUser user = await userManager.FindByNameAsync(identity.Name);
 
             if (user == null)
             {
@@ -28,20 +26,7 @@ namespace MvcNetFramework.Services
                     NationalCode = identity.Name,
                     UserName = identity.Name
                 };
-                await UserManager.CreateAsync(user);
-            }
-        }
-
-        public async Task ManageUserRolesAsync(ClaimsIdentity identity)
-        {
-            var ssoRoles = identity.Claims
-                .Where(c => c.Type.StartsWith("MPI_"))
-                .Select(c => c.Value)
-                .ToArray();
-
-            foreach (var role in ssoRoles)
-            {
-                identity.AddClaim(new Claim("role", role));
+                await userManager.CreateAsync(user);
             }
         }
     }

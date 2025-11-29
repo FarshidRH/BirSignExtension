@@ -4,9 +4,8 @@ using MapIdeaHub.BirSign.SharedKernel.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MvcNetCore.Data;
+using MvcNetCore.Helpers;
 using MvcNetCore.Models;
-using MvcNetCore.Services;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,19 +24,10 @@ builder.Services.AddControllersWithViews();
 
 if (BirSignSettings.IsUseBirSign(builder.Configuration))
 {
-    builder.Services.BirSignAuthentication(builder.Configuration, options =>
-    {
-        options.Events.OnTokenValidated = async (context) =>
-        {
-            var identity = context.Principal!.Identity as ClaimsIdentity;
+    builder.Services.BirSignAuthentication(
+        builder.Configuration,
+        UserHelper.EnsureUserExistsAsync);
 
-            var userService = context.HttpContext.RequestServices.GetRequiredService<UserService>();
-            await userService.EnsureUserExistsAsync(identity!);
-            await userService.ManageUserRolesAsync(identity!);
-        };
-    });
-
-    builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped(sp =>
     {
         var config = builder.Configuration.GetSection("BirSign");

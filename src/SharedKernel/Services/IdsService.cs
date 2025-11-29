@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace MapIdeaHub.BirSign.SharedKernel.Services
 {
+    /// <summary>
+    /// Provides methods for sending user and role information to an external identity service using HTTP APIs.
+    /// </summary>
+    /// <remarks>The IdsService class is intended for integration scenarios where user and role data must be
+    /// synchronized with an external identity provider. Instances of this class are typically configured with the
+    /// authority and API URIs, as well as client credentials required for authentication.</remarks>
     public class IdsService
     {
         private readonly HttpClient _httpClient;
@@ -16,6 +22,16 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
         private readonly string _clientId;
         private readonly string _clientSecret;
 
+        /// <summary>
+        /// Initializes a new instance of the IdsService class using the specified authority URI, BirSign API URI,
+        /// client ID, and client secret.
+        /// </summary>
+        /// <remarks>This constructor creates an internal HttpClient instance for use by the service. If
+        /// you need to customize the HttpClient, use the constructor that accepts an HttpClient parameter.</remarks>
+        /// <param name="authorityUri">The base URI of the authority service used for authentication. Cannot be null or empty.</param>
+        /// <param name="birSignApiUri">The base URI of the BirSign API endpoint. Cannot be null or empty.</param>
+        /// <param name="clientId">The client identifier used for authentication with the authority service. Cannot be null or empty.</param>
+        /// <param name="clientSecret">The client secret, in plain text, used for authentication with the authority service. Cannot be null or empty.</param>
         public IdsService(
             string authorityUri,
             string birSignApiUri,
@@ -24,20 +40,35 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             : this(new HttpClient(), authorityUri, birSignApiUri, clientId, clientSecret)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the IdsService class with the specified HTTP client and configuration
+        /// parameters.
+        /// </summary>
+        /// <param name="httpClient">The HttpClient instance used to send HTTP requests to external services. Must not be null.</param>
+        /// <param name="authorityUri">The base URI of the authority service used for authentication. Cannot be null or empty.</param>
+        /// <param name="birSignApiUri">The base URI of the BirSign API endpoint. Cannot be null or empty.</param>
+        /// <param name="clientId">The client identifier used for authentication with the authority service. Cannot be null or empty.</param>
+        /// <param name="clientSecret">The client secret, in plain text, used for authentication with the authority service. Cannot be null or empty.</param>
         public IdsService(
             HttpClient httpClient,
             string authorityUri,
             string birSignApiUri,
             string clientId,
-            string clientSecretNotHashed)
+            string clientSecret)
         {
             _httpClient = httpClient;
             _authorityUri = authorityUri;
             _birSignApiUri = birSignApiUri;
             _clientId = clientId;
-            _clientSecret = clientSecretNotHashed;
+            _clientSecret = clientSecret;
         }
 
+        /// <summary>
+        /// Sends a user registration request to the remote API asynchronously.
+        /// </summary>
+        /// <param name="users">The user registration details to be sent. Cannot be null.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse object with the
+        /// API's response as a string.</returns>
         public async Task<ApiReponse<string>> SendUsersAsync(UserRequest users)
         {
             var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageUsersApi/Register";
@@ -54,6 +85,12 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             return JsonSerializer.Deserialize<ApiReponse<string>>(content);
         }
 
+        /// <summary>
+        /// Sends a set of role assignments to the remote API asynchronously.
+        /// </summary>
+        /// <param name="roles">The role assignment request to be sent. Cannot be null.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse object with the
+        /// API's response as a string.</returns>
         public async Task<ApiReponse<string>> SendRolesAsync(RoleRequest roles)
         {
             var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageRolesApi/SendRoles";
