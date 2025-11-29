@@ -14,9 +14,11 @@ namespace MvcNetFramework.Services
 
         public async Task EnsureUserExistsAsync(ClaimsIdentity identity)
         {
-            if (await UserManager.FindByNameAsync(identity.Name) == null)
+            ApplicationUser user = await UserManager.FindByNameAsync(identity.Name);
+
+            if (user == null)
             {
-                var user = new ApplicationUser()
+                user = new ApplicationUser()
                 {
                     Name = identity.Claims.FirstOrDefault(c => c.Type == "MPH_name")?.Value ?? "",
                     Family = identity.Claims.FirstOrDefault(c => c.Type == "MPH_family")?.Value ?? "",
@@ -32,14 +34,15 @@ namespace MvcNetFramework.Services
 
         public async Task ManageUserRolesAsync(ClaimsIdentity identity)
         {
-            var user = await UserManager.FindByNameAsync(identity.Name);
-            if (user == null) { return; }
+            var ssoRoles = identity.Claims
+                .Where(c => c.Type.StartsWith("MPI_"))
+                .Select(c => c.Value)
+                .ToArray();
 
-            var dbUserRoles = (await UserManager.GetRolesAsync(user.Id)).ToArray();
-            await UserManager.RemoveFromRolesAsync(user.Id, dbUserRoles);
-
-            var ssoUserRoles = identity.Claims.Where(c => c.Type.StartsWith("MPI_")).Select(c => c.Value).ToArray();
-            await UserManager.AddToRolesAsync(user.Id, ssoUserRoles);
+            foreach (var role in ssoRoles)
+            {
+                identity.AddClaim(new Claim("role", role));
+            }
         }
     }
 }

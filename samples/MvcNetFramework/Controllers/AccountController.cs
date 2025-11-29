@@ -1,4 +1,5 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
+using MapIdeaHub.BirSign.SharedKernel.Constants;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -43,7 +44,7 @@ namespace MvcNetFramework.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
                 return Redirect(BirSignConstants.LoginUri);
             }
@@ -59,7 +60,7 @@ namespace MvcNetFramework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
                 return Redirect(BirSignConstants.LoginUri);
             }
@@ -135,9 +136,9 @@ namespace MvcNetFramework.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
-                return Redirect(BirSignConstants.RegisterUri);
+                return Redirect(BirSignSettings.RegisterUri);
             }
 
             return View(new RegisterViewModel());
@@ -150,9 +151,9 @@ namespace MvcNetFramework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
-                return Redirect(BirSignConstants.RegisterUri);
+                return Redirect(BirSignSettings.RegisterUri);
             }
 
             if (ModelState.IsValid)
@@ -406,10 +407,9 @@ namespace MvcNetFramework.Controllers
         //
         // POST: /Account/LogOff
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
                 AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
 
@@ -417,7 +417,7 @@ namespace MvcNetFramework.Controllers
                     new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") },
                     BirSignConstants.AuthenticationType);
 
-                return new EmptyResult();
+                return new HttpUnauthorizedResult();
             }
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);

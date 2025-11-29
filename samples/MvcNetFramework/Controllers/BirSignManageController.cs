@@ -1,7 +1,8 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Dtos;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Services;
+﻿using MapIdeaHub.BirSign.SharedKernel.Dtos;
+using MapIdeaHub.BirSign.SharedKernel.Services;
 using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ using System.Web.Mvc;
 
 namespace MvcNetFramework.Controllers
 {
-    [Authorize(Roles = "Admin")]
     public class BirSignManageController : Controller
     {
         private readonly IdsService _idsService;
@@ -24,7 +24,11 @@ namespace MvcNetFramework.Controllers
 
         public BirSignManageController()
         {
-            _idsService = new IdsService();
+            _idsService = new IdsService(
+                ConfigurationManager.AppSettings["BirSign:Authority"],
+                ConfigurationManager.AppSettings["BirSign:ApiUri"],
+                ConfigurationManager.AppSettings["BirSign:ClientId"],
+                ConfigurationManager.AppSettings["BirSign:ClientSecret"]);
         }
 
         public BirSignManageController(

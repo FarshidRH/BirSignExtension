@@ -1,4 +1,5 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
+using MapIdeaHub.BirSign.SharedKernel.Constants;
 using Microsoft.AspNet.Identity;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -17,15 +18,25 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Controllers
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public void Login(string returnUrl)
         {
             var properties = new AuthenticationProperties { RedirectUri = returnUrl ?? "/" };
-            HttpContext.GetOwinContext().Authentication.Challenge(properties, BirSignConstants.AuthenticationType);
-            return new HttpUnauthorizedResult();
+            AuthenticationManager.Challenge(properties, BirSignConstants.AuthenticationType);
+        }
+
+        [HttpGet]
+        public ActionResult FrontChannelLogout()
+        {
+            AuthenticationManager.SignOut(
+                DefaultAuthenticationTypes.ApplicationCookie,
+                DefaultAuthenticationTypes.ExternalCookie,
+                BirSignConstants.AuthenticationType);
+
+            return new HttpStatusCodeResult(200);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Logout()
+        public async Task<ActionResult> BackChannelLogout()
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -38,8 +49,11 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Controllers
                 try
                 {
                     await ValidateLogoutTokenAsync(logoutToken);
-                    AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-                    Session.Abandon();
+
+                    AuthenticationManager.SignOut(
+                        DefaultAuthenticationTypes.ApplicationCookie,
+                        DefaultAuthenticationTypes.ExternalCookie,
+                        BirSignConstants.AuthenticationType);
                 }
                 catch
                 {
@@ -53,16 +67,15 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Controllers
         private async Task ValidateLogoutTokenAsync(string logoutToken)
         {
             var configManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                $"{BirSignConstants.Authority}/.well-known/openid-configuration",
+                $"{BirSignSettings.Authority}/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever());
 
             var config = await configManager.GetConfigurationAsync(CancellationToken.None);
-
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var validationParams = new TokenValidationParameters
             {
-                ValidIssuer = BirSignConstants.Authority,
+                ValidIssuer = BirSignSettings.Authority,
                 ValidateAudience = false, // logout_token has no audience claim
                 IssuerSigningKeys = config.SigningKeys,
                 ValidateLifetime = true

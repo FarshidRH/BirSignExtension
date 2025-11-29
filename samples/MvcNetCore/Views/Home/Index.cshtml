@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style type="text/css">
+    dt {
+        font-weight: normal;
+    }
+
+    dd {
+        font-weight: bold;
+    }
+</style>
+<main>
+    <section class="row" aria-labelledby="aspnetTitle">
+        <h1>Actions</h1>
+        <hr />
+        <section class="col-md-6 mb-3">
+            <a href="@Url.Action("SendRoles", "BirSignManage")" target="_blank" class="btn btn-outline-dark">Send Roles</a>
+        </section>
+    </section>
+    <div class="row">
+        <section class="col-md-4">
+            <h1>User Status</h1>
+            <hr />
+            @if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                <b class="text-success">Authorized</b>
+            }
+            else
+            {
+                <b class="text-danger">Unauthorized</b>
+            }
+        </section>
+        @if (User?.Identity?.IsAuthenticated ?? false)
+        {
+            <section class="col-md-4">
+                <h1>User Info</h1>
+                <hr />
+                <dl>
+                    <dt>Name</dt>
+                    <dd>@(User!.FindFirst("MPH_name")?.Value ?? "-")</dd>
+                    <dt>Family</dt>
+                    <dd>@(User!.FindFirst("MPH_family")?.Value ?? "-")</dd>
+                    <dt>NationalCode</dt>
+                    <dd>@(User!.FindFirst("name")?.Value ?? "-")</dd>
+                    <dt>Birthdate</dt>
+                    <dd>@(User!.FindFirst("MPH_birthdate")?.Value ?? "-")</dd>
+                    <dt>PhoneNumber</dt>
+                    <dd>@(User!.FindFirst("MPH_phonenumber")?.Value ?? "-")</dd>
+                    <dt>Email</dt>
+                    <dd>@(User!.FindFirst("MPH_email")?.Value ?? "-")</dd>
+                    <dt>Username</dt>
+                    <dd>@(User!.FindFirst("name")?.Value ?? "-")</dd>
+                </dl>
+            </section>
+            <section class="col-md-4">
+                <h1>User Roles</h1>
+                <hr />
+                @foreach (var role in User!.Claims
+                            .Where(x => x.Type == "role")
+                            .Select(x => x.Value)
+                            .ToList())
+                {
+                    <p><b>@role</b></p>
+                }
+            </section>
+        }
+    </div>
+</main>

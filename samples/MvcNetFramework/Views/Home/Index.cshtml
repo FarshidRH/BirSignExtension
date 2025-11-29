@@ -1,4 +1,4 @@
-﻿@model MvcNetFramework.Models.ApplicationUser
+﻿@using System.Security.Claims
 @{
     ViewBag.Title = "Home Page";
 }
@@ -24,15 +24,13 @@
         <section class="col-md-4">
             <h1>User Status</h1>
             <hr />
-            @if (!User.Identity.IsAuthenticated)
+            @if (User.Identity.IsAuthenticated)
             {
-                <section class="col-md-4">
-                    <b class="text-danger">Unauthorized</b>
-                </section>
+                <b class="text-success">Authorized</b>
             }
             else
             {
-                <b class="text-success">Authorized</b>
+                <b class="text-danger">Unauthorized</b>
             }
         </section>
         @if (User.Identity.IsAuthenticated)
@@ -42,28 +40,28 @@
                 <hr />
                 <dl>
                     <dt>Name</dt>
-                    <dd>@Model.Name</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("MPH_name")?.Value ?? "-")</dd>
                     <dt>Family</dt>
-                    <dd>@(Model?.Family ?? "-")</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("MPH_family")?.Value ?? "-")</dd>
                     <dt>NationalCode</dt>
-                    <dd>@(Model?.NationalCode ?? "-")</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("name")?.Value ?? "-")</dd>
                     <dt>Birthdate</dt>
-                    <dd>@(Model?.BirthDay ?? "-")</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("MPH_birthdate")?.Value ?? "-")</dd>
                     <dt>PhoneNumber</dt>
-                    <dd>@(Model?.PhoneNumber ?? "-")</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("MPH_phonenumber")?.Value ?? "-")</dd>
                     <dt>Email</dt>
-                    <dd>@Model.Email</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("MPH_email")?.Value ?? "-")</dd>
                     <dt>Username</dt>
-                    <dd>@Model.UserName</dd>
+                    <dd>@(((ClaimsPrincipal)User).FindFirst("name")?.Value ?? "-")</dd>
                 </dl>
             </section>
             <section class="col-md-4">
                 <h1>User Roles</h1>
                 <hr />
-                @{
-                    var roles = (List<string>)ViewBag.Roles;
-                }
-                @foreach (var role in roles)
+                @foreach (var role in ((ClaimsPrincipal)User).Claims
+                    .Where(x => x.Type == "role")
+                    .Select(x => x.Value)
+                    .ToList())
                 {
                     <p><b>@role</b></p>
                 }

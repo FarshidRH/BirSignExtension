@@ -1,10 +1,9 @@
 ﻿using MapIdeaHub.BirSign.NetFrameworkExtension;
-using MapIdeaHub.BirSign.NetFrameworkExtension.Constants;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OpenIdConnect;
 using MvcNetFramework.Models;
 using MvcNetFramework.Models.DbContext;
 using MvcNetFramework.Services;
@@ -30,7 +29,7 @@ namespace MvcNetFramework
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString(BirSignConstants.IsUseBirSign ? BirSignConstants.LoginUri : "/Account/Login"),
+                LoginPath = new PathString("/Account/Login"),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.
@@ -52,20 +51,17 @@ namespace MvcNetFramework
 
             // Uncomment the following lines to enable logging in with third party login providers
 
-            if (BirSignConstants.IsUseBirSign)
+            if (BirSignSettings.IsUseBirSign)
             {
                 app.UseBirSignAuthentication(options =>
                 {
-                    options.Notifications = new OpenIdConnectAuthenticationNotifications
+                    options.Notifications.SecurityTokenValidated = async n =>
                     {
-                        SecurityTokenValidated = async n =>
-                        {
-                            var identity = n.AuthenticationTicket.Identity;
+                        var identity = n.AuthenticationTicket.Identity;
 
-                            var userService = new UserService();
-                            await userService.EnsureUserExistsAsync(identity);
-                            await userService.ManageUserRolesAsync(identity);
-                        }
+                        var userService = new UserService();
+                        await userService.EnsureUserExistsAsync(identity);
+                        await userService.ManageUserRolesAsync(identity);
                     };
                 });
             }
