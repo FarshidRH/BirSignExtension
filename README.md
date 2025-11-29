@@ -7,6 +7,7 @@ Designed for easy integration, this library helps developers add SSO capabilitie
 ## 📦 NuGet Packages
 
 .Net Framework Extension: [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension)
+
 .Net Core Extension: [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension)
 
 ## 🧪 Sample Projects
