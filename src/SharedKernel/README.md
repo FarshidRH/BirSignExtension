@@ -1,1 +1,1 @@
-.Net Framework Extension for BirSign
+Shared Kernel for BirSign
