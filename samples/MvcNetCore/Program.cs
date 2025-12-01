@@ -26,7 +26,7 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
 {
     builder.Services.BirSignAuthentication(
         builder.Configuration,
-        UserHelper.EnsureUserExistsAsync);
+        manageUser: UserHelper.EnsureUserExistsAsync);
 
     builder.Services.AddScoped(sp =>
     {

@@ -54,8 +54,7 @@ namespace MvcNetFramework
             if (BirSignSettings.IsUseBirSign)
             {
                 app.UseBirSignAuthentication(
-                    manageUser: UserHelper.EnsureUserExistsAsync,
-                    optionsConfigurator: null);
+                    manageUser: UserHelper.EnsureUserExistsAsync);
             }
 
             //app.UseMicrosoftAccountAuthentication(

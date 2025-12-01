@@ -73,8 +73,8 @@ public static class AuthenticationExtensions
             options.RemoteSignOutPath = new PathString(logoutRedirectUri);
             options.SignedOutCallbackPath = new PathString(postLogoutRedirectUri);
 
-            // IdentityServer4 does not natively support PAR so disable it to avoid the error
-            options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.Disable;
+            // For enforced security
+            options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.UseIfAvailable;
 
             // Require PKCE for added security
             options.UsePkce = true;
