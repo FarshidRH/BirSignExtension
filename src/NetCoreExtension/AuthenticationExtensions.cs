@@ -24,7 +24,7 @@ public static class AuthenticationExtensions
     /// <param name="manageUser">Optional function to manage user creation or updates upon successful authentication.</param>
     /// <param name="optionsConfigurator">Optional action to further customize OpenIdConnectOptions.</param>
     /// <returns>The IServiceCollection for chaining.</returns>
-    public static IServiceCollection BirSignAuthentication(
+    public static IServiceCollection AddBirSignAuthentication(
         this IServiceCollection services,
         IConfiguration configuration,
         Func<IServiceProvider, ClaimsIdentity, Task>? manageUser = null,

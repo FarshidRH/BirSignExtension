@@ -24,7 +24,7 @@ builder.Services.AddControllersWithViews();
 
 if (BirSignSettings.IsUseBirSign(builder.Configuration))
 {
-    builder.Services.BirSignAuthentication(
+    builder.Services.AddBirSignAuthentication(
         builder.Configuration,
         manageUser: UserHelper.EnsureUserExistsAsync);
 
