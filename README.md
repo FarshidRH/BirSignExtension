@@ -24,8 +24,8 @@
 
 | نام پروژه                     | توضیحات                                               | مسیر در مخزن |
 |-------------------------------|--------------------------------------------------------|---------------|
-| ASP.NET MVC (.Net Framework) | نمونه‌ای از اتصال برنامه MVC کلاسیک به بیرساین | [/samples/MvcNetFramework](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetFramework) |
-| ASP.NET MVC (.Net Core)      | نمونه‌ای از اتصال پروژه MVC Core به بیرساین          | [/samples/MvcNetCore](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetCore) |
+| ASP.NET MVC (.Net Framework) | نمونه‌ای از اتصال برنامه MVC کلاسیک به بیرساین | [samples/MvcNetFramework](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetFramework) |
+| ASP.NET MVC (.Net Core)      | نمونه‌ای از اتصال پروژه MVC Core به بیرساین          | [samples/MvcNetCore](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetCore) |
 
 ## 🚀 راهنمای نصب و استفاده
 برای راه‌اندازی سریع و استفاده از اکستنشن‌های بیرساین، به مستندات موجود در [ویکی پروژه (Wiki)](https://github.com/FarshidRH/BirSignExtension/wiki) مراجعه کنید. این مستندات شامل راهنمای گام‌به‌گام نصب، پیکربندی و نمونه‌های کد برای راه‌اندازی سریع است.
