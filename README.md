@@ -1,26 +1,38 @@
-﻿# Extensions for BirSign
+﻿<div dir="rtl">
 
-Extensions for BirSign is a .NET library that simplifies the integration of Single Sign-On (SSO) into customer applications. It provides a lightweight and extensible framework that streamlines authentication setup, reduces configuration overhead, and accelerates secure connectivity across enterprise systems.
 
-Designed for easy integration, this library helps developers add SSO capabilities to their .NET apps with minimal effort—whether you're building web applications, desktop software, or microservices.
+# اکستنشن‌های بیرساین (BirSign Extensions)
 
-## 📦 NuGet Packages
+اکستنشن‌های بیرساین مجموعه‌ای از کتابخانه‌های تخصصی در بستر ‪.NET‬ هستند که فرآیند یکپارچه‌سازی سامانه‌های مختلف با سرویس Single Sign-On بیرساین را ساده و استاندارد می‌سازند.  
+این ابزارها با هدف کاهش پیچیدگی‌های پیکربندی OIDC و افزایش سرعت توسعه طراحی شده‌اند تا تیم‌های فنی بتوانند بدون درگیری با جزئیات پروتکل، احراز هویت امن و متمرکز را در نرم‌افزارهای خود فعال کنند.
 
-.Net Framework Extension: [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension)
+این مجموعه برای انواع پروژه‌ها شامل برنامه‌های وب، سرویس‌ها، نرم‌افزارهای سازمانی و میکروسرویس‌ها قابل استفاده است و امکان توسعه‌پذیری کامل را نیز فراهم می‌نماید.
 
-.Net Core Extension: [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension)
+## 📦 پکیج‌های منتشر شده در NuGet
 
-## 🧪 Sample Projects
+نسخه‌های مختلف اکستنشن برای فریم‌ورک‌های ‪.NET‬ به صورت پکیج‌های جداگانه ارائه شده‌اند:
 
-Explore the following sample projects to see how to use the library in different scenarios:
+- **‪.NET Framework Extension:‬**  
+  [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetFrameworkExtension)
 
-| Sample Name                 | Description                                                | Path in Repo |
-|-----------------------------|------------------------------------------------------------|--------------|
-| ASP.NET MVC .Net Framework  | Shows how to use the library in ASP.NET MVC .Net Framework | [`/samples/MvcNetFramework`](samples/MvcNetFramework) |
-| ASP.NET MVC .Net Core       | Shows how to use the library in ASP.NET MVC .Net Core      | [`/samples/MvcNetCore`](samples/MvcNetCore) |
+- **‪.NET Core Extension: ‬**  
+  [https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension](https://www.nuget.org/packages/MapIdeaHub.BirSign.NetCoreExtension)
 
-## 📄 License
+## 🧪 پروژه‌های نمونه (Sample Projects)
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE.txt) file for details.
+برای مشاهده‌ی نحوه‌ی پیاده‌سازی عملی این اکستنشن‌ها، پروژه‌های نمونه زیر در مخزن قرار گرفته‌اند:
 
+| نام پروژه                     | توضیحات                                               | مسیر در مخزن |
+|-------------------------------|--------------------------------------------------------|---------------|
+| ASP.NET MVC (.Net Framework) | نمونه‌ای از اتصال برنامه MVC کلاسیک به بیرساین | [/samples/MvcNetFramework](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetFramework) |
+| ASP.NET MVC (.Net Core)      | نمونه‌ای از اتصال پروژه MVC Core به بیرساین          | [/samples/MvcNetCore](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetCore) |
+
+## 🚀 راهنمای نصب و استفاده
+برای راه‌اندازی سریع و استفاده از اکستنشن‌های بیرساین، به مستندات موجود در [ویکی پروژه (Wiki)](https://github.com/FarshidRH/BirSignExtension/wiki) مراجعه کنید. این مستندات شامل راهنمای گام‌به‌گام نصب، پیکربندی و نمونه‌های کد برای راه‌اندازی سریع است.
+
+## 📄 لایسنس
+
+این پروژه تحت لایسنس **MIT** منتشر شده است. برای مطالعه جزئیات، فایل LICENSE را مشاهده کنید.
+
+</div>
 
