@@ -47,17 +47,25 @@ jobs:
       # ---------------------------
       - name: Install Persian fonts (Vazirmatn)
         run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip fontconfig
+
+          # Download Vazirmatn
+          wget -q https://github.com/rastikerdar/vazirmatn/releases/download/v33.003/vazirmatn-v33.003.zip -O vazirmatn.zip
+
+          # Create directory for installation
           sudo mkdir -p /usr/local/share/fonts/truetype/vazirmatn
-          sudo wget -q https://github.com/rastikerdar/vazirmatn/releases/download/v33.003/Vazirmatn-ttf.zip -O vazirmatn.zip
-          sudo apt-get install -y unzip
-          sudo unzip vazirmatn.zip -d /usr/local/share/fonts/truetype/vazirmatn
 
-          # Move real font files from fonts/ttf/
-          if [ -d "/usr/local/share/fonts/truetype/vazirmatn/fonts/ttf" ]; then
-            sudo mv /usr/local/share/fonts/truetype/vazirmatn/fonts/ttf/*.ttf /usr/local/share/fonts/truetype/vazirmatn/
-            sudo rm -rf /usr/local/share/fonts/truetype/vazirmatn/fonts
-          fi
+          # Unzip safely (some ZIPs contain folder, some do not)
+          sudo unzip -o vazirmatn.zip -d /usr/local/share/fonts/truetype/vazirmatn/
 
+          # Move all .ttf files from any subdirectory to root font directory
+          sudo find /usr/local/share/fonts/truetype/vazirmatn -type f -name "*.ttf" -exec mv {} /usr/local/share/fonts/truetype/vazirmatn/ \;
+
+          # Clean subfolders (optional)
+          sudo find /usr/local/share/fonts/truetype/vazirmatn -mindepth 1 -type d -exec rm -rf {} +
+
+          # Refresh font cache
           sudo fc-cache -fv
 
       # ---------------------------
