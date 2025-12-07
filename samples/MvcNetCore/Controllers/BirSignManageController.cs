@@ -7,9 +7,10 @@ using Microsoft.EntityFrameworkCore;
 namespace MvcNetCore.Controllers
 {
     public class BirSignManageController(
-        IdsService _idsService,
+        IdsService idsService,
         RoleManager<IdentityRole> roleManager) : Controller
     {
+        private readonly IdsService _idsService = idsService;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
         public async Task<ActionResult> SendRoles()
