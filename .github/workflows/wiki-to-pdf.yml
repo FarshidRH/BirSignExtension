@@ -1,0 +1,97 @@
+name: Build Wiki PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------
+      # 1. Checkout main repository
+      # ---------------------------
+      - name: Checkout Main Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      # ---------------------------
+      # 2. Checkout Wiki repository
+      # ---------------------------
+      - name: Checkout Wiki Repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+
+      # ---------------------------
+      # 3. Install Pandoc
+      # ---------------------------
+      - name: Install Pandoc
+        uses: pandoc/actions/setup@v1
+
+      # ---------------------------
+      # 4. Install full TeX engine
+      # Required for PDF output
+      # ---------------------------
+      - name: Install TeXLive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full
+
+      # ---------------------------
+      # 5. Create order list if not exists
+      # (Sort alphabetically as fallback)
+      # ---------------------------
+      - name: Generate _order.txt if missing
+        run: |
+          cd wiki
+          if [ ! -f "_order.txt" ]; then
+            ls *.md | sort > _order.txt
+          fi
+
+      # ---------------------------
+      # 6. Combine Markdown files
+      # ---------------------------
+      - name: Combine Markdown files
+        run: |
+          cd wiki
+          xargs cat < _order.txt > combined.md
+
+      # ---------------------------
+      # 7. Create Persian LaTeX template
+      # ---------------------------
+      - name: Create Persian template
+        run: |
+          cat <<EOF > wiki/template.tex
+          \usepackage{fontspec}
+          \setmainfont{Vazirmatn}
+          \newfontfamily\arabicfont[Script=Arabic]{Vazirmatn}
+          \usepackage{bidi}
+          EOF
+
+      # ---------------------------
+      # 8. Convert to PDF (with TOC)
+      # ---------------------------
+      - name: Convert Wiki to PDF
+        run: |
+          cd wiki
+          pandoc combined.md \
+            --from markdown \
+            --pdf-engine=xelatex \
+            --template=template.tex \
+            --toc --toc-depth=3 \
+            -o BirSign-Wiki.pdf
+
+      # ---------------------------
+      # 9. Upload PDF as CI artifact
+      # ---------------------------
+      - name: Upload PDF Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: BirSign-Wiki
+          path: wiki/BirSign-Wiki.pdf
