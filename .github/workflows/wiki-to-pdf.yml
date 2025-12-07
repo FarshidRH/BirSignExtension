@@ -91,7 +91,7 @@ jobs:
       # 9. Upload PDF as CI artifact
       # ---------------------------
       - name: Upload PDF Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BirSign-Wiki
           path: wiki/BirSign-Wiki.pdf
