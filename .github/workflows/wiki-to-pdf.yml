@@ -63,15 +63,16 @@ jobs:
           xargs cat < _order.txt > combined.md
 
       # ---------------------------
-      # 7. Create Persian LaTeX template
+      # 7. Create Persian YAML config
       # ---------------------------
-      - name: Create Persian template
+      - name: Create Persian font config
         run: |
-          cat <<EOF > wiki/template.tex
-          \usepackage{fontspec}
-          \setmainfont{Vazirmatn}
-          \newfontfamily\arabicfont[Script=Arabic]{Vazirmatn}
-          \usepackage{bidi}
+          cat <<EOF > wiki/persian.yaml
+          header-includes:
+            - \usepackage{fontspec}
+            - \setmainfont{Vazirmatn}
+            - \newfontfamily\arabicfont[Script=Arabic]{Vazirmatn}
+            - \usepackage{bidi}
           EOF
 
       # ---------------------------
@@ -83,8 +84,8 @@ jobs:
           pandoc combined.md \
             --from markdown \
             --pdf-engine=xelatex \
-            --template=template.tex \
             --toc --toc-depth=3 \
+            --metadata-file=persian.yaml \
             -o BirSign-Wiki.pdf
 
       # ---------------------------
