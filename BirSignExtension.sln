@@ -25,13 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreExtension", "src\Net
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "src\SharedKernel\SharedKernel.csproj", "{4CE3CFB2-084F-4F93-9EDD-DF8B537C4085}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{B46CA083-B5F7-4677-8AD1-5542D6A7102F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{984CDD0A-81C7-43F6-A8F8-9FEF84EA9EBC}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\wiki-to-pdf.yml = .github\workflows\wiki-to-pdf.yml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,7 +61,6 @@ Global
 		{35A434F8-3A28-4A73-B2EA-4D4E7BF6586B} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
 		{646B6AFE-D487-4AB2-AB6F-BE870FC21711} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{4CE3CFB2-084F-4F93-9EDD-DF8B537C4085} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{984CDD0A-81C7-43F6-A8F8-9FEF84EA9EBC} = {B46CA083-B5F7-4677-8AD1-5542D6A7102F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA929340-9093-4586-BF61-99D65D2E99CB}
