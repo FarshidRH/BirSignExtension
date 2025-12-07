@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 1
 
       # ---------------------------
-      # 2. Checkout Wiki repository
+      # 2. Checkout Wiki Repository
       # ---------------------------
       - name: Checkout Wiki Repo
         uses: actions/checkout@v3
@@ -35,8 +35,7 @@ jobs:
         uses: pandoc/actions/setup@v1
 
       # ---------------------------
-      # 4. Install full TeX engine
-      # Required for PDF output
+      # 4. Install TeXLive (XeLaTeX)
       # ---------------------------
       - name: Install TeXLive
         run: |
@@ -44,8 +43,18 @@ jobs:
           sudo apt-get install -y texlive-full
 
       # ---------------------------
-      # 5. Create order list if not exists
-      # (Sort alphabetically as fallback)
+      # 5. Install Persian Font: Vazirmatn
+      # ---------------------------
+      - name: Install Persian fonts (Vazirmatn)
+        run: |
+          sudo mkdir -p /usr/local/share/fonts/truetype/vazirmatn
+          sudo wget -q https://github.com/rastikerdar/vazirmatn/releases/download/v33.003/vazirmatn-v33.003.zip -O vazirmatn.zip
+          sudo apt-get install -y unzip
+          sudo unzip vazirmatn.zip -d /usr/local/share/fonts/truetype/vazirmatn
+          sudo fc-cache -fv
+
+      # ---------------------------
+      # 6. Generate _order.txt if missing
       # ---------------------------
       - name: Generate _order.txt if missing
         run: |
@@ -55,7 +64,7 @@ jobs:
           fi
 
       # ---------------------------
-      # 6. Combine Markdown files
+      # 7. Combine all Markdown pages
       # ---------------------------
       - name: Combine Markdown files
         run: |
@@ -63,20 +72,20 @@ jobs:
           xargs cat < _order.txt > combined.md
 
       # ---------------------------
-      # 7. Create Persian YAML config
+      # 8. Create Persian LaTeX config
       # ---------------------------
-      - name: Create Persian font config
+      - name: Create Persian LaTeX configuration
         run: |
           cat <<EOF > wiki/persian.yaml
           header-includes:
             - \usepackage{fontspec}
-            - \setmainfont{Vazirmatn}
-            - \newfontfamily\arabicfont[Script=Arabic]{Vazirmatn}
+            - \setmainfont{Vazirmatn-Regular.ttf}
+            - \newfontfamily\arabicfont[Script=Arabic]{Vazirmatn-Regular.ttf}
             - \usepackage{bidi}
           EOF
 
       # ---------------------------
-      # 8. Convert to PDF (with TOC)
+      # 9. Convert combined markdown to PDF
       # ---------------------------
       - name: Convert Wiki to PDF
         run: |
@@ -84,12 +93,12 @@ jobs:
           pandoc combined.md \
             --from markdown \
             --pdf-engine=xelatex \
-            --toc --toc-depth=3 \
             --metadata-file=persian.yaml \
+            --toc --toc-depth=3 \
             -o BirSign-Wiki.pdf
 
       # ---------------------------
-      # 9. Upload PDF as CI artifact
+      # 10. Upload PDF as artifact
       # ---------------------------
       - name: Upload PDF Artifact
         uses: actions/upload-artifact@v4
