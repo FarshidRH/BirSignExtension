@@ -48,9 +48,16 @@ jobs:
       - name: Install Persian fonts (Vazirmatn)
         run: |
           sudo mkdir -p /usr/local/share/fonts/truetype/vazirmatn
-          sudo wget -q https://github.com/rastikerdar/vazirmatn/releases/download/v33.003/vazirmatn-v33.003.zip -O vazirmatn.zip
+          sudo wget -q https://github.com/rastikerdar/vazirmatn/releases/download/v33.003/Vazirmatn-ttf.zip -O vazirmatn.zip
           sudo apt-get install -y unzip
           sudo unzip vazirmatn.zip -d /usr/local/share/fonts/truetype/vazirmatn
+
+          # Move real font files from fonts/ttf/
+          if [ -d "/usr/local/share/fonts/truetype/vazirmatn/fonts/ttf" ]; then
+            sudo mv /usr/local/share/fonts/truetype/vazirmatn/fonts/ttf/*.ttf /usr/local/share/fonts/truetype/vazirmatn/
+            sudo rm -rf /usr/local/share/fonts/truetype/vazirmatn/fonts
+          fi
+
           sudo fc-cache -fv
 
       # ---------------------------
