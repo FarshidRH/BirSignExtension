@@ -51,17 +51,7 @@ public static class AuthenticationExtensions
         });
 
         // Add cookie authentication for session management
-        authBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-        {
-            options.LoginPath = "/Identity/Account/Login";
-            options.LogoutPath = "/Identity/Account/Logout";
-            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-            options.SlidingExpiration = true;
-            options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.SameSite = SameSiteMode.Lax;
-        });
+        authBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
         // Add OpenID Connect handler for BirSign
         authBuilder.AddOpenIdConnect(BirSignConstants.AuthenticationType, options =>
