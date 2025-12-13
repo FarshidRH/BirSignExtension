@@ -8,7 +8,7 @@
   
   <PropertyGroup Label="Nuget">
     <PackageId>$(RootNamespace)</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Farshid Rezaei</Authors>
     <Description>Shared Kernel for BirSign</Description>
     <Copyright>Copyright © MapIdeaHub 2025</Copyright>
@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
+    <PackageReference Include="System.Text.Json" Version="10.0.1" />
   </ItemGroup>
 
 </Project>
