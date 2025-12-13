@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationExtensions.cs" />
+    <Compile Include="Helpers\ParHelper.cs" />
     <Compile Include="Models\BirSignSettings.cs" />
     <Compile Include="Controllers\BirSignController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

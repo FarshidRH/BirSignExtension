@@ -9,7 +9,9 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension.Models
             ConfigurationManager.AppSettings["BirSign:IsUse"] != null &&
             Convert.ToBoolean(ConfigurationManager.AppSettings["BirSign:IsUse"]);
 
-        internal static string Authority { get; set; }
         public static string RegisterUri { get; internal set; }
+
+        internal static string Authority { get; set; }
+        internal static string PushAuthorizationRequestEndpoint { get; set; }
     }
 }

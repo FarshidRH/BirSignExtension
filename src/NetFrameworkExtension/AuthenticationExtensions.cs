@@ -1,4 +1,5 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
+﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Helpers;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using MapIdeaHub.BirSign.SharedKernel.Helpers;
 using Microsoft.AspNet.Identity;
@@ -51,14 +52,14 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                 ClientSecret = ConfigurationManager.AppSettings["BirSign:ClientSecret"],
                 RedirectUri = ConfigurationManager.AppSettings["BirSign:RedirectUri"],
                 PostLogoutRedirectUri = ConfigurationManager.AppSettings["BirSign:PostLogoutRedirectUri"],
-                ResponseType = OpenIdConnectResponseType.IdToken,
-                //ResponseMode = OpenIdConnectResponseMode.Query,
                 Scope = OpenIdConnectScope.OpenIdProfile,
                 AuthenticationType = BirSignConstants.AuthenticationType,
                 SignInAsAuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                
+                ResponseType = OpenIdConnectResponseType.Code,
+                ResponseMode = OpenIdConnectResponseMode.Query,
+                UsePkce = true,
+                RedeemCode = true,
                 UseTokenLifetime = false,
-                //UsePkce = true,
                 TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -69,14 +70,22 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                 },
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
-                    SecurityTokenValidated = async n =>
+                    SecurityTokenValidated = async notification =>
                     {
-                        var identity = n.AuthenticationTicket.Identity;
+                        var identity = notification.AuthenticationTicket.Identity;
                         identity.AddUserRoles();
 
                         if (manageUser != null)
                         {
                             await manageUser(identity);
+                        }
+                    },
+                    RedirectToIdentityProvider = async notification =>
+                    {
+                        var openIdConnectRequestType = notification.ProtocolMessage.RequestType;
+                        if (openIdConnectRequestType == OpenIdConnectRequestType.Authentication)
+                        {
+                            await ParHelper.EnablePar(notification);
                         }
                     },
                 },
