@@ -66,37 +66,36 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
         /// <summary>
         /// Sends a user registration request to the remote API asynchronously.
         /// </summary>
-        /// <param name="users">The user registration details to be sent. Cannot be null.</param>
+        /// <param name="userRequest">The user registration details to be sent. Cannot be null.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse object with the
         /// API's response as a string.</returns>
-        public async Task<ApiReponse<string>> SendUsersAsync(UserRequest users)
+        public async Task<string> SendUsersAsync(UserRequest userRequest)
         {
             var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageUsersApi/Register";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
-            var jsonContent = JsonSerializer.Serialize(users);
+            var jsonContent = JsonSerializer.Serialize(userRequest);
             request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var accessToken = await GetAccessTokenAsync("send_users_to_ids_scope");
+            var accessToken = await GetAccessTokenAsync("external_user_registration_scope");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _httpClient.SendAsync(request);
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ApiReponse<string>>(content);
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
         /// Sends a set of role assignments to the remote API asynchronously.
         /// </summary>
-        /// <param name="roles">The role assignment request to be sent. Cannot be null.</param>
+        /// <param name="roleRequest">The role assignment request to be sent. Cannot be null.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse object with the
         /// API's response as a string.</returns>
-        public async Task<ApiReponse<string>> SendRolesAsync(RoleRequest roles)
+        public async Task<ApiReponse<string>> SendRolesAsync(RoleRequest roleRequest)
         {
             var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageRolesApi/SendRoles";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
-            var jsonContent = JsonSerializer.Serialize(roles);
+            var jsonContent = JsonSerializer.Serialize(roleRequest);
             request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             var accessToken = await GetAccessTokenAsync("send_roles_to_ids_scope");
@@ -111,10 +110,10 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
         {
             var parameters = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
             {
-                    new KeyValuePair<string, string>("client_id", _clientId ),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
-                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                    new KeyValuePair<string, string>("scope", scope)
+                new KeyValuePair<string, string>("client_id", _clientId ),
+                new KeyValuePair<string, string>("client_secret", _clientSecret),
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("scope", scope)
             });
 
             var requestUri = $"{_authorityUri.TrimEnd('/')}/connect/token";

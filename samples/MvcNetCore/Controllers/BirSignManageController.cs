@@ -49,13 +49,18 @@ namespace MvcNetCore.Controllers
 
         public async Task<ActionResult> SendUsers()
         {
-            var user = new UserRequest
+            var userRequest = new UserRequest
             {
-
+                NationalCode = "1234567890",
+                BirthDate = "1234/56/78",
+                PhoneNumber = "091234567890",
+                Email = "user@example.com",
+                Password = "$trongPassw0rd",
+                ActiveDirectoryUser = null,
             };
 
-            var result = await _idsService.SendUsersAsync(user);
-            return Json(result);
+            var result = await _idsService.SendUsersAsync(userRequest);
+            return Content(result);
         }
     }
 }
