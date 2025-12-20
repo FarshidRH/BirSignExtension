@@ -12,6 +12,7 @@ using System;
 using System.Configuration;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web.Helpers;
 
 namespace MapIdeaHub.BirSign.NetFrameworkExtension
 {
@@ -38,6 +39,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
             BirSignSettings.Authority = options.Authority;
             BirSignSettings.RegisterUri = $"{options.Authority.TrimEnd('/')}/Account/Register";
 
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = options.TokenValidationParameters.NameClaimType;
             app.SetDefaultSignInAsAuthenticationType(DefaultAuthenticationTypes.ApplicationCookie);
             return app.UseOpenIdConnectAuthentication(options);
         }
