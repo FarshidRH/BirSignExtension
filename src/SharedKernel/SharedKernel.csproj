@@ -8,7 +8,7 @@
   
   <PropertyGroup Label="Nuget">
     <PackageId>$(RootNamespace)</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Authors>Farshid Rezaei</Authors>
     <Description>Shared Kernel for BirSign</Description>
     <Copyright>Copyright © MapIdeaHub 2025</Copyright>
