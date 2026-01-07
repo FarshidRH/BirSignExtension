@@ -79,7 +79,6 @@ namespace MvcNetFramework.Controllers
                 BirthDate = "1234/56/78",
                 PhoneNumber = "091234567890",
                 Email = "user@example.com",
-                Password = "$trongPassw0rd",
                 ActiveDirectoryUser = null,
             };
 
