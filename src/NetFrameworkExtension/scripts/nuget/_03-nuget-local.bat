@@ -5,6 +5,6 @@ cd /d "%~dp0"
 cd ../..
 
 set srcPackageSourcePath="."
-set destPackageSourcePath="D:\local-nugets"
+set destPackageSourcePath="D:\Nugets"
 
 nuget init %srcPackageSourcePath% %destPackageSourcePath%
