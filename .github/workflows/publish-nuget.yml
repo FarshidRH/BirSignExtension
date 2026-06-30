@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  VERSION: 4.0.${{ github.run_number }}
+
 jobs:
   publish:
     runs-on: windows-latest
@@ -31,7 +34,7 @@ jobs:
       # 1. SharedKernel – must be published first (dependency of both)
       # ------------------------------------------------------------------
       - name: Pack SharedKernel
-        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore
+        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
 
       - name: Publish SharedKernel to NuGet
         run: dotnet nuget push "src/SharedKernel/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
@@ -40,7 +43,7 @@ jobs:
       # 2. NetCoreExtension (.NET 9 / SDK-style)
       # ------------------------------------------------------------------
       - name: Pack NetCoreExtension
-        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore
+        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
 
       - name: Publish NetCoreExtension to NuGet
         run: dotnet nuget push "src/NetCoreExtension/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
@@ -50,7 +53,7 @@ jobs:
       # ------------------------------------------------------------------
       - name: Pack NetFrameworkExtension
         working-directory: src/NetFrameworkExtension
-        run: nuget pack -Build -Properties Configuration=Release
+        run: nuget pack -Build -Properties "Configuration=Release" -Version ${{ env.VERSION }}
 
       - name: Publish NetFrameworkExtension to NuGet
         working-directory: src/NetFrameworkExtension
