@@ -43,7 +43,24 @@ namespace MvcNetCore.Controllers
                 }
             }
 
-            var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles });
+            var claims = new List<ClaimInfo>
+            {
+                new()
+                {
+                    ClaimType = "AllowedLocations",
+                    Description = "سالن‌های مجاز دسترسی",
+                    ValueType = ClaimValueType.PredefinedList,
+                    PredefinedValues = ["salon1", "salon2"]
+                },
+                new()
+                {
+                    ClaimType = "IsVIPChecker",
+                    Description = "آیا کاربر ارشد بررسی بلیط است؟",
+                    ValueType = ClaimValueType.Boolean
+                }
+            };
+
+            var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles, Claims = claims });
             return Json(result);
         }
 
