@@ -5,6 +5,6 @@ cd /d "%~dp0"
 cd ../..
 
 set srcPackageSourcePath="bin\Release\*.nupkg"
-set destPackageSourcePath="D:\local-nugets"
+set destPackageSourcePath="D:\Nugets"
 
 dotnet nuget push %srcPackageSourcePath% --source %destPackageSourcePath%

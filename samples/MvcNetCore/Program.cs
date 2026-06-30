@@ -80,4 +80,10 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
+// Apply any pending migrations at startup
+await using var scope = app.Services.CreateAsyncScope();
+var services = scope.ServiceProvider;
+var dbContext = services.GetRequiredService<ApplicationDbContext>();
+await dbContext.Database.MigrateAsync();
+
 app.Run();

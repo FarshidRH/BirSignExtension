@@ -106,7 +106,7 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             return JsonSerializer.Deserialize<ApiReponse<string>>(content);
         }
 
-        private async Task<string> GetAccessTokenAsync(string scope)
+        public async Task<string> GetAccessTokenAsync(string scope)
         {
             var parameters = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
             {
