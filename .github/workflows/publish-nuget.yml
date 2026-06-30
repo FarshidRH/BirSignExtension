@@ -27,7 +27,10 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Restore NuGet packages (solution)
+      - name: Restore packages (SDK-style projects)
+        run: dotnet restore
+
+      - name: Restore packages (packages.config projects)
         run: nuget restore BirSignExtension.sln
 
       # ------------------------------------------------------------------
@@ -37,7 +40,10 @@ jobs:
         run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
 
       - name: Publish SharedKernel to NuGet
-        run: dotnet nuget push "src/SharedKernel/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: |
+          Get-ChildItem src/SharedKernel/bin/Release/*.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
       # ------------------------------------------------------------------
       # 2. NetCoreExtension (.NET 9 / SDK-style)
@@ -46,7 +52,10 @@ jobs:
         run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
 
       - name: Publish NetCoreExtension to NuGet
-        run: dotnet nuget push "src/NetCoreExtension/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: |
+          Get-ChildItem src/NetCoreExtension/bin/Release/*.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
       # ------------------------------------------------------------------
       # 3. NetFrameworkExtension (.NET Framework 4.8 / nuspec)
@@ -57,4 +66,7 @@ jobs:
 
       - name: Publish NetFrameworkExtension to NuGet
         working-directory: src/NetFrameworkExtension
-        run: nuget push "*.nupkg" -ApiKey ${{ secrets.NUGET_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+        run: |
+          Get-ChildItem *.nupkg | ForEach-Object {
+            nuget push $_.FullName -ApiKey ${{ secrets.NUGET_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+          }
