@@ -1,0 +1,57 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages (solution)
+        run: nuget restore BirSignExtension.sln
+
+      # ------------------------------------------------------------------
+      # 1. SharedKernel – must be published first (dependency of both)
+      # ------------------------------------------------------------------
+      - name: Pack SharedKernel
+        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore
+
+      - name: Publish SharedKernel to NuGet
+        run: dotnet nuget push "src/SharedKernel/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      # ------------------------------------------------------------------
+      # 2. NetCoreExtension (.NET 9 / SDK-style)
+      # ------------------------------------------------------------------
+      - name: Pack NetCoreExtension
+        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore
+
+      - name: Publish NetCoreExtension to NuGet
+        run: dotnet nuget push "src/NetCoreExtension/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      # ------------------------------------------------------------------
+      # 3. NetFrameworkExtension (.NET Framework 4.8 / nuspec)
+      # ------------------------------------------------------------------
+      - name: Pack NetFrameworkExtension
+        working-directory: src/NetFrameworkExtension
+        run: nuget pack -Build -Properties Configuration=Release
+
+      - name: Publish NetFrameworkExtension to NuGet
+        working-directory: src/NetFrameworkExtension
+        run: nuget push "*.nupkg" -ApiKey ${{ secrets.NUGET_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
