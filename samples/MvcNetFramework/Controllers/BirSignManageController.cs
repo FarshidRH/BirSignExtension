@@ -2,9 +2,11 @@
 using MapIdeaHub.BirSign.SharedKernel.Services;
 using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -67,7 +69,24 @@ namespace MvcNetFramework.Controllers
                 }
             }
 
-            var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles });
+            var claims = new List<ClaimInfo>
+            {
+                new ClaimInfo
+                {
+                    ClaimType = "AllowedLocations",
+                    Description = "سالن‌های مجاز دسترسی",
+                    ValueType = ClaimValueType.PredefinedList,
+                    PredefinedValues = new List<string> {"salon1", "salon2"}
+                },
+                new ClaimInfo
+                {
+                    ClaimType = "IsVIPChecker",
+                    Description = "آیا کاربر ارشد بررسی بلیط است؟",
+                    ValueType = ClaimValueType.Boolean
+                }
+            };
+
+            var result = await _idsService.SendRolesAsync(new RoleRequest { Roles = roles, Claims = claims });
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
