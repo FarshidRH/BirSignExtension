@@ -1,4 +1,4 @@
-﻿using MapIdeaHub.BirSign.SharedKernel.Dtos;
+using MapIdeaHub.BirSign.SharedKernel.Dtos;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -104,6 +104,101 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<ApiReponse<string>>(content);
+        }
+
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        /// <summary>
+        /// Retrieves the department tree structure from the remote API asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<DepartmentApiDto>> GetDepartmentTreeAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetDepartmentTree";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<DepartmentApiDto>>(content, JsonOptions);
+        }
+
+        /// <summary>
+        /// Retrieves the list of positions by department from the remote API asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<List<PositionApiDto>>> GetPositionsByDepartmentAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetPositionsByDepartment";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<List<PositionApiDto>>>(content, JsonOptions);
+        }
+
+        /// <summary>
+        /// Retrieves the list of user positions by department from the remote API asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<List<UserPositionApiDto>>> GetUserPositionsByDepartmentAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetUserPositionsByDepartment";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<List<UserPositionApiDto>>>(content, JsonOptions);
+        }
+
+        /// <summary>
+        /// Retrieves the list of active assignments by department from the remote API asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<List<UserPositionApiDto>>> GetActiveAssignmentsByDepartmentAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetActiveAssignmentsByDepartment";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<List<UserPositionApiDto>>>(content, JsonOptions);
+        }
+
+        /// <summary>
+        /// Retrieves the department tree structure along with detailed information from the remote API asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<DepartmentTreeApiDto>> GetDepartmentTreeWithDetailsAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetDepartmentTreeWithDetails";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<DepartmentTreeApiDto>>(content, JsonOptions);
         }
 
         public async Task<string> GetAccessTokenAsync(string scope)
