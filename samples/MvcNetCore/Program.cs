@@ -36,7 +36,13 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
 {
     builder.Services.AddBirSignAuthentication(
         builder.Configuration,
-        manageUser: UserHelper.EnsureUserExistsAsync);
+        manageUser: UserHelper.EnsureUserExistsAsync,
+        webhookUrl: "/api/birsign/webhook",
+        webhookHandler: async (webhookEvent) =>
+        {
+            Console.WriteLine($"[Webhook Received] EventType: {webhookEvent.EventType}, Timestamp: {webhookEvent.Timestamp}");
+            await Task.CompletedTask;
+        });
 
     builder.Services.AddScoped(sp =>
     {

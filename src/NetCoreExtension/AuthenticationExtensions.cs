@@ -1,4 +1,4 @@
-﻿using MapIdeaHub.BirSign.NetCoreExtension.Models;
+using MapIdeaHub.BirSign.NetCoreExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using MapIdeaHub.BirSign.SharedKernel.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -27,7 +27,9 @@ public static class AuthenticationExtensions
         this IServiceCollection services,
         IConfiguration configuration,
         Func<IServiceProvider, ClaimsIdentity, Task>? manageUser = null,
-        Action<OpenIdConnectOptions>? optionsConfigurator = null)
+        Action<OpenIdConnectOptions>? optionsConfigurator = null,
+        string? webhookUrl = "/api/birsign/webhook",
+        Func<MapIdeaHub.BirSign.SharedKernel.Dtos.WebhookEvent, Task>? webhookHandler = null)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
@@ -108,6 +110,11 @@ public static class AuthenticationExtensions
             BirSignSettings.Authority = options.Authority;
             BirSignSettings.RegisterUri = $"{options.Authority?.TrimEnd('/')}/Account/Register";
         });
+
+        if (webhookHandler != null && !string.IsNullOrEmpty(webhookUrl))
+        {
+            services.AddSingleton<Microsoft.AspNetCore.Hosting.IStartupFilter>(new WebhookStartupFilter(webhookUrl, webhookHandler));
+        }
 
         return services;
     }

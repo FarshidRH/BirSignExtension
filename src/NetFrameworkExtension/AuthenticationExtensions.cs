@@ -1,4 +1,4 @@
-﻿using MapIdeaHub.BirSign.NetFrameworkExtension.Helpers;
+using MapIdeaHub.BirSign.NetFrameworkExtension.Helpers;
 using MapIdeaHub.BirSign.NetFrameworkExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using MapIdeaHub.BirSign.SharedKernel.Helpers;
@@ -31,7 +31,9 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
         public static IAppBuilder UseBirSignAuthentication(
             this IAppBuilder app,
             Func<ClaimsIdentity, Task> manageUser = null,
-            Action<OpenIdConnectAuthenticationOptions> optionsConfigurator = null)
+            Action<OpenIdConnectAuthenticationOptions> optionsConfigurator = null,
+            string webhookUrl = "/api/birsign/webhook",
+            Func<MapIdeaHub.BirSign.SharedKernel.Dtos.WebhookEvent, Task> webhookHandler = null)
         {
             var options = GetDefaultOpenIdConnectAuthenticationOptions(manageUser);
             optionsConfigurator?.Invoke(options);
@@ -41,6 +43,12 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
 
             AntiForgeryConfig.UniqueClaimTypeIdentifier = options.TokenValidationParameters.NameClaimType;
             app.SetDefaultSignInAsAuthenticationType(DefaultAuthenticationTypes.ApplicationCookie);
+
+            if (webhookHandler != null && !string.IsNullOrEmpty(webhookUrl))
+            {
+                app.Use<WebhookOwinMiddleware>(webhookUrl, webhookHandler);
+            }
+
             return app.UseOpenIdConnectAuthentication(options);
         }
 
