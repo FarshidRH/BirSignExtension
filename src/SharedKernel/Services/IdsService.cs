@@ -201,6 +201,42 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             return JsonSerializer.Deserialize<ApiReponse<DepartmentTreeApiDto>>(content, JsonOptions);
         }
 
+        /// <summary>
+        /// Retrieves the list of users from parent to leaf asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<List<UserPositionApiDto>>> GetUsersFromParentToLeafAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetUsersFromParentToLeaf";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<List<UserPositionApiDto>>>(content, JsonOptions);
+        }
+
+        /// <summary>
+        /// Retrieves the list of active users from parent to leaf asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiReponse<List<UserPositionApiDto>>> GetActiveUsersFromParentToLeafAsync()
+        {
+            var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageChartApi/GetActiveUsersFromParentToLeaf";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var accessToken = await GetAccessTokenAsync("get_chart_data_scope");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApiReponse<List<UserPositionApiDto>>>(content, JsonOptions);
+        }
+
         public async Task<string> GetAccessTokenAsync(string scope)
         {
             var parameters = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>

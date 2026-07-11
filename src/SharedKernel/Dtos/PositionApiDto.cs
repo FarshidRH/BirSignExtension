@@ -1,3 +1,4 @@
+using MapIdeaHub.BirSign.SharedKernel.Enums;
 using System;
 
 namespace MapIdeaHub.BirSign.SharedKernel.Dtos
@@ -10,7 +11,7 @@ namespace MapIdeaHub.BirSign.SharedKernel.Dtos
         public string DepartmentTitle { get; set; }
         public string Description { get; set; }
         public string QualificationCriteria { get; set; }
-        public int PositionType { get; set; } // 1=Chief, 2=Expert
+        public PositionType PositionType { get; set; }
         public int Row { get; set; }
     }
 }
