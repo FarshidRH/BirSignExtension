@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using MapIdeaHub.BirSign.SharedKernel.Enums;
 
 namespace MvcNetCore.Models
 {
@@ -11,5 +12,7 @@ namespace MvcNetCore.Models
         public string? BirthDay { get; set; }
 
         public string? NationalCode { get; set; }
+
+        public GenderType Gender { get; set; }
     }
 }
