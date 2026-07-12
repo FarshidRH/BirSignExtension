@@ -8,6 +8,8 @@ namespace MapIdeaHub.BirSign.SharedKernel.Dtos
         public string Description { get; set; }
         public ClaimValueType ValueType { get; set; }
         public List<string> PredefinedValues { get; set; }
+        public List<string> DependentRoles { get; set; }
+        public List<string> DependentClaims { get; set; }
     }
 
     public enum ClaimValueType
