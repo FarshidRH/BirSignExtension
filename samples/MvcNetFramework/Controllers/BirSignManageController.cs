@@ -76,7 +76,8 @@ namespace MvcNetFramework.Controllers
                     ClaimType = "AllowedLocations",
                     Description = "سالن‌های مجاز دسترسی",
                     ValueType = ClaimValueType.PredefinedList,
-                    PredefinedValues = new List<string> {"salon1", "salon2"}
+                    PredefinedValues = new List<string> {"salon1", "salon2"},
+                    DependentRoles = new List<string> {"User"}
                 },
                 new ClaimInfo
                 {

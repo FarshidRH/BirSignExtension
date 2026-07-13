@@ -29,7 +29,7 @@ public static class AuthenticationExtensions
         Func<IServiceProvider, ClaimsIdentity, Task>? manageUser = null,
         Action<OpenIdConnectOptions>? optionsConfigurator = null,
         string? webhookUrl = "/api/birsign/webhook",
-        Func<MapIdeaHub.BirSign.SharedKernel.Dtos.WebhookEvent, Task>? webhookHandler = null)
+        Func<IServiceProvider, MapIdeaHub.BirSign.SharedKernel.Dtos.WebhookEvent, Task>? webhookHandler = null)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);

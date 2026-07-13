@@ -50,13 +50,14 @@ namespace MvcNetCore.Controllers
                     ClaimType = "AllowedLocations",
                     Description = "سالن‌های مجاز دسترسی",
                     ValueType = ClaimValueType.PredefinedList,
-                    PredefinedValues = ["salon1", "salon2"]
+                    PredefinedValues = ["salon1", "salon2"],
+                    DependentRoles = ["User"]
                 },
                 new()
                 {
                     ClaimType = "IsVIPChecker",
                     Description = "آیا کاربر ارشد بررسی بلیط است؟",
-                    ValueType = ClaimValueType.Boolean
+                    ValueType = ClaimValueType.Boolean,
                 }
             };
 

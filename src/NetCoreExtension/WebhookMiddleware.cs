@@ -11,9 +11,9 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
     {
         private readonly RequestDelegate _next;
         private readonly string _path;
-        private readonly Func<WebhookEvent, Task> _handler;
+        private readonly Func<IServiceProvider, WebhookEvent, Task> _handler;
 
-        public WebhookMiddleware(RequestDelegate next, string path, Func<WebhookEvent, Task> handler)
+        public WebhookMiddleware(RequestDelegate next, string path, Func<IServiceProvider, WebhookEvent, Task> handler)
         {
             _next = next;
             _path = path;
@@ -37,7 +37,7 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
 
                         if (@event != null)
                         {
-                            await _handler(@event);
+                            await _handler(context.RequestServices, @event);
                         }
                     }
 
