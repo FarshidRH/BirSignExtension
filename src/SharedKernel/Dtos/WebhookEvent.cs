@@ -73,6 +73,7 @@ namespace MapIdeaHub.BirSign.SharedKernel.Dtos
     {
         public UserPositionDeletedEvent() => EventType = "UserPositionDeleted";
         public Guid UserPositionId { get; set; }
+        public Guid PositionId { get; set; }
     }
 
     public class UserProfileUpdatedEvent : WebhookEvent
