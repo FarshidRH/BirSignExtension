@@ -1,6 +1,9 @@
 ﻿@using System.Security.Claims
 @{
     ViewBag.Title = "Home Page";
+
+    bool isAuthenticated = User?.Identity?.IsAuthenticated == true;
+    bool isAuthorized = isAuthenticated && ((ClaimsPrincipal)User).Claims.Any(x => x.Type == "role");
 }
 
 <style type="text/css">
@@ -25,16 +28,20 @@
         <section class="col-md-4">
             <h1>User Status</h1>
             <hr />
-            @if (User.Identity.IsAuthenticated)
+            @if (isAuthorized)
             {
                 <b class="text-success">Authorized</b>
             }
+            else if (isAuthenticated)
+            {
+                <b class="text-danger">Authenticated But <em>Unauthorized</em></b>
+            }
             else
             {
-                <b class="text-danger">Unauthorized</b>
+                <b class="text-danger">Unauthenticated</b>
             }
         </section>
-        @if (User.Identity.IsAuthenticated)
+        @if (isAuthorized)
         {
             <section class="col-md-4">
                 <h1>User Info</h1>
