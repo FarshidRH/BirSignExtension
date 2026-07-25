@@ -60,9 +60,9 @@ namespace MvcNetFramework.Controllers
                         role.Description = "دسترسی ادمین برای مدیریت کامل سیستم";
                         break;
                     case "User":
-                        role.IsPublicForAll = true;
+                        role.IsPublicForAll = false;
                         role.IsPublicForOrganUsers = false;
-                        role.Description = "دسترسی عمومی برای کاربران عادی سامانه";
+                        role.Description = "دسترسی برای کاربران عادی سامانه";
                         break;
                     default:
                         throw new NotImplementedException($"The role of '{role.Name}' is not defined in the system.");

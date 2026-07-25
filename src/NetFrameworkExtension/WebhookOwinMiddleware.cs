@@ -1,9 +1,9 @@
+using MapIdeaHub.BirSign.SharedKernel.Dtos;
+using Microsoft.Owin;
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Owin;
-using MapIdeaHub.BirSign.SharedKernel.Dtos;
 
 namespace MapIdeaHub.BirSign.NetFrameworkExtension
 {
