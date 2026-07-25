@@ -1,14 +1,16 @@
-﻿using MapIdeaHub.BirSign.NetCoreExtension.Models;
+using MapIdeaHub.BirSign.NetCoreExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MapIdeaHub.BirSign.NetCoreExtension.Controllers;
 
@@ -22,34 +24,38 @@ public class BirSignController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> BackChannelLogout()
+    [AllowAnonymous]
+    public async Task<ActionResult> BackChannelLogout([FromServices] IMemoryCache memoryCache)
     {
-        if (User?.Identity?.IsAuthenticated == true)
+        try
         {
             var form = await Request.ReadFormAsync();
             var logoutToken = form["logout_token"].ToString();
             if (string.IsNullOrEmpty(logoutToken))
             {
-                return BadRequest();
+                return BadRequest("Logout token is missing.");
             }
 
-            try
-            {
-                await ValidateLogoutTokenAsync(logoutToken!);
+            var principal = await ValidateLogoutTokenAsync(logoutToken);
 
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                await HttpContext.SignOutAsync(BirSignConstants.AuthenticationType);
-            }
-            catch
+            var sub = principal.FindFirst("sub")?.Value 
+                      ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(sub))
             {
-                return BadRequest();
+                // Record the revoked subject ID in memory cache for 24 hours
+                memoryCache.Set($"RevokedUser_{sub}", true, TimeSpan.FromHours(24));
             }
+
+            return Ok();
         }
-
-        return Ok();
+        catch (Exception ex)
+        {
+            return BadRequest($"Back-channel logout validation failed: {ex.Message}");
+        }
     }
 
-    private static async Task ValidateLogoutTokenAsync(string logoutToken)
+    private static async Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken)
     {
         var configManager = new ConfigurationManager<OpenIdConnectConfiguration>(
             $"{BirSignSettings.Authority}/.well-known/openid-configuration",
@@ -61,11 +67,12 @@ public class BirSignController : Controller
         var validationParams = new TokenValidationParameters
         {
             ValidIssuer = BirSignSettings.Authority,
-            ValidateAudience = false, // logout_token has no audience claim
+            ValidateAudience = false,
             IssuerSigningKeys = config.SigningKeys,
             ValidateLifetime = true
         };
 
-        tokenHandler.ValidateToken(logoutToken, validationParams, out _);
+        var principal = tokenHandler.ValidateToken(logoutToken, validationParams, out _);
+        return principal;
     }
 }

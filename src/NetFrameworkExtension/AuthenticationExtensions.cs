@@ -10,6 +10,7 @@ using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
 using System;
 using System.Configuration;
+using System.Runtime.Caching;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Helpers;
@@ -21,13 +22,6 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
         /// <summary>
         /// Enables BirSign authentication using OpenID Connect in the OWIN application pipeline.
         /// </summary>
-        /// <remarks>Call this method to add BirSign authentication to your OWIN pipeline. The method
-        /// applies default OpenID Connect options, then allows further customization through the provided configurator
-        /// action. This extension should be called during application startup.</remarks>
-        /// <param name="app">The OWIN application builder to which the authentication middleware is added.</param>
-        /// <param name="manageUser">An optional function to manage user creation or updates upon successful authentication.</param>
-        /// <param name="optionsConfigurator">An optional action to further customize the OpenID Connect authentication options.</param>
-        /// <returns>The original <see cref="IAppBuilder"/> instance, enabling further middleware configuration.</returns>
         public static IAppBuilder UseBirSignAuthentication(
             this IAppBuilder app,
             Func<ClaimsIdentity, Task> manageUser = null,
@@ -49,7 +43,32 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                 app.Use<WebhookOwinMiddleware>(webhookUrl, webhookHandler);
             }
 
-            return app.UseOpenIdConnectAuthentication(options);
+            app.UseOpenIdConnectAuthentication(options);
+
+            // Back-channel logout session invalidation OWIN middleware
+            app.Use(async (context, next) =>
+            {
+                if (context.Authentication?.User?.Identity?.IsAuthenticated == true)
+                {
+                    var sub = context.Authentication.User.FindFirst("sub")?.Value 
+                              ?? context.Authentication.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                    if (!string.IsNullOrEmpty(sub) && MemoryCache.Default.Contains($"RevokedUser_{sub}"))
+                    {
+                        context.Authentication.SignOut(
+                            DefaultAuthenticationTypes.ApplicationCookie,
+                            DefaultAuthenticationTypes.ExternalCookie,
+                            BirSignConstants.AuthenticationType);
+
+                        context.Response.Redirect(context.Request.Uri.PathAndQuery);
+                        return;
+                    }
+                }
+
+                await next();
+            });
+
+            return app;
         }
 
         private static OpenIdConnectAuthenticationOptions
@@ -84,6 +103,14 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                     {
                         var identity = notification.AuthenticationTicket.Identity;
                         identity.AddUserRoles();
+
+                        var sub = identity.FindFirst("sub")?.Value 
+                                  ?? identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                        if (!string.IsNullOrEmpty(sub))
+                        {
+                            MemoryCache.Default.Remove($"RevokedUser_{sub}");
+                        }
 
                         if (manageUser != null)
                         {

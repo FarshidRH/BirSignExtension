@@ -1,9 +1,11 @@
 using MapIdeaHub.BirSign.NetCoreExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using MapIdeaHub.BirSign.SharedKernel.Helpers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -43,6 +45,8 @@ public static class AuthenticationExtensions
         var logoutRedirectUri = ssoConfig["LogoutRedirectUri"];
         var postLogoutRedirectUri = ssoConfig["PostLogoutRedirectUri"];
 
+        services.AddMemoryCache();
+
         // Add authentication services
         var authBuilder = services.AddAuthentication(options =>
         {
@@ -51,8 +55,25 @@ public static class AuthenticationExtensions
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         });
 
-        // Add cookie authentication for session management
-        authBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+        // Add cookie authentication for session management with back-channel logout check
+        authBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.Events.OnValidatePrincipal = async (context) =>
+            {
+                var sub = context.Principal?.FindFirst("sub")?.Value 
+                          ?? context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (!string.IsNullOrEmpty(sub))
+                {
+                    var memoryCache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
+                    if (memoryCache != null && memoryCache.TryGetValue($"RevokedUser_{sub}", out _))
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                }
+            };
+        });
 
         // Add OpenID Connect handler for BirSign
         authBuilder.AddOpenIdConnect(BirSignConstants.AuthenticationType, options =>
@@ -95,6 +116,15 @@ public static class AuthenticationExtensions
                 {
                     var identity = context.Principal!.Identity as ClaimsIdentity;
                     identity!.AddUserRoles();
+
+                    var sub = identity?.FindFirst("sub")?.Value 
+                              ?? identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                    if (!string.IsNullOrEmpty(sub))
+                    {
+                        var memoryCache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
+                        memoryCache?.Remove($"RevokedUser_{sub}");
+                    }
 
                     if (manageUser is not null)
                     {
