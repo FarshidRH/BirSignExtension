@@ -12,6 +12,10 @@ jobs:
   publish:
     runs-on: windows-latest
 
+    permissions:
+      id-token: write   # required so this job can request a GitHub OIDC token for Trusted Publishing
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,6 +38,17 @@ jobs:
         run: nuget restore BirSignExtension.sln
 
       # ------------------------------------------------------------------
+      # NuGet Trusted Publishing: exchange a short-lived GitHub OIDC token
+      # for a temporary nuget.org API key (valid ~1 hour). Requested once
+      # here and reused for all three pushes below.
+      # ------------------------------------------------------------------
+      - name: NuGet login (OIDC -> temp API key)
+        uses: NuGet/login@v1
+        id: nuget_login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      # ------------------------------------------------------------------
       # 1. SharedKernel – must be published first (dependency of both)
       # ------------------------------------------------------------------
       - name: Pack SharedKernel
@@ -42,7 +57,7 @@ jobs:
       - name: Publish SharedKernel to NuGet
         run: |
           Get-ChildItem src/SharedKernel/bin/Release/*.nupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push $_.FullName --api-key ${{ steps.nuget_login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
 
       # ------------------------------------------------------------------
@@ -54,7 +69,7 @@ jobs:
       - name: Publish NetCoreExtension to NuGet
         run: |
           Get-ChildItem src/NetCoreExtension/bin/Release/*.nupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push $_.FullName --api-key ${{ steps.nuget_login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
 
       # ------------------------------------------------------------------
@@ -68,5 +83,5 @@ jobs:
         working-directory: src/NetFrameworkExtension
         run: |
           Get-ChildItem *.nupkg | ForEach-Object {
-            nuget push $_.FullName -ApiKey ${{ secrets.NUGET_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+            nuget push $_.FullName -ApiKey ${{ steps.nuget_login.outputs.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
           }
