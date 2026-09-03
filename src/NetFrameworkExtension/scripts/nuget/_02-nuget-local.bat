@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 cd ../..
 
-set packageId=MapIdeaHub.BirSign.NetCoreExtension
+set packageId=MapIdeaHub.BirSign.NetFrameworkExtension
 set feed=D:\Nugets
 set srcPackageSourcePath="bin\Release\*.nupkg"
 set destPackageSourcePath="%feed%"

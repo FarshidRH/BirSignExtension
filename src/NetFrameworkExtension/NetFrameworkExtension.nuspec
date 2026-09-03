@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package >
+<!--
+	Packed from this .nuspec rather than from the .csproj, so nuget.exe never has to
+	locate an MSBuild instance of its own (it can pick the wrong one on machines with
+	several installed). Build and pack in one step from the repository root:
+
+		dotnet msbuild src/NetFrameworkExtension/NetFrameworkExtension.csproj -t:PackNuspec -p:Configuration=Release
+
+	$version$ and $configuration$ are supplied by that target from MSBuild.
+-->
+<package>
 	<metadata>
-		<id>$id$</id>
+		<id>MapIdeaHub.BirSign.NetFrameworkExtension</id>
 		<version>$version$</version>
-		<title>$title$</title>
+		<title>MapIdeaHub.BirSign.NetFrameworkExtension</title>
 		<authors>Farshid Rezaei</authors>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="expression">MIT</license>
 		<projectUrl>https://github.com/FarshidRH/BirSignExtension</projectUrl>
-		<description>$description$</description>
-		<copyright>$copyright$</copyright>
+		<description>.Net Framework Extension for BirSign</description>
+		<copyright>Copyright © MapIdeaHub 2025</copyright>
 		<tags>sso;netframework;utility;birsign</tags>
 		<readme>README.md</readme>
 		<dependencies>
 			<group targetFramework=".NETFramework4.8">
-				<dependency id="MapIdeaHub.BirSign.SharedKernel" version="[1.0.0, )" />
+				<dependency id="MapIdeaHub.BirSign.SharedKernel" version="$version$" />
 			</group>
 		</dependencies>
 	</metadata>
 	<files>
 		<file src="README.md" target="" />
+		<file src="bin\$configuration$\MapIdeaHub.BirSign.NetFrameworkExtension.dll" target="lib\net48" />
 	</files>
 </package>

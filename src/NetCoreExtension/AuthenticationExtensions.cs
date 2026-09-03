@@ -1,4 +1,7 @@
 using MapIdeaHub.BirSign.NetCoreExtension.Models;
+#if !NET9_0_OR_GREATER
+using MapIdeaHub.BirSign.NetCoreExtension.Helpers;
+#endif
 using MapIdeaHub.BirSign.SharedKernel.Constants;
 using MapIdeaHub.BirSign.SharedKernel.Helpers;
 using Microsoft.AspNetCore.Authentication;
@@ -86,7 +89,9 @@ public static class AuthenticationExtensions
             options.SignedOutCallbackPath = new PathString(postLogoutRedirectUri);
 
             // For enforced security
+#if NET9_0_OR_GREATER
             options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.UseIfAvailable;
+#endif
 
             // Require PKCE for added security
             options.UsePkce = true;
@@ -112,6 +117,10 @@ public static class AuthenticationExtensions
 
             options.Events = new OpenIdConnectEvents
             {
+#if !NET9_0_OR_GREATER
+                // Before .NET 9 there is no built-in PAR support, so push the request by hand.
+                OnRedirectToIdentityProvider = ParHelper.EnablePar,
+#endif
                 OnTokenValidated = async (context) =>
                 {
                     var identity = context.Principal!.Identity as ClaimsIdentity;

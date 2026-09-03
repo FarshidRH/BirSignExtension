@@ -3,14 +3,13 @@
   <PropertyGroup>
     <RootNamespace>MapIdeaHub.BirSign.$(MSBuildProjectName)</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget">
     <PackageId>$(RootNamespace)</PackageId>
-    <Version>1.4.0</Version>
     <Authors>Farshid Rezaei</Authors>
     <Description>.Net Core Extension for BirSign</Description>
     <Copyright>Copyright © MapIdeaHub 2025</Copyright>
@@ -25,8 +24,18 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.11" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.30" />
+    <!-- The 8.0.x handler only pulls Microsoft.IdentityModel 7.x, which lacks OpenIdConnectScope.Profile. -->
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.22.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>

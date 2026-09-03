@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    Single source of truth for the version of all three BirSign packages.
+
+    Every project in the repo imports this file, so a local `dotnet pack` / `nuget pack`
+    and the CI publish produce the same version. Bump this value to cut a release; CI
+    publishes exactly what is set here and skips the push when that version already
+    exists on nuget.org.
+  -->
+  <PropertyGroup Label="Versioning">
+    <Version>4.1.0</Version>
+  </PropertyGroup>
+
+</Project>

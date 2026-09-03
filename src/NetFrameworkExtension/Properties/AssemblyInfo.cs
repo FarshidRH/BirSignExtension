@@ -29,5 +29,9 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
+// Deliberately fixed. Raising AssemblyVersion would force every consuming app to add a
+// binding redirect, so it only moves on a breaking change -- not on a release.
+// AssemblyFileVersion and AssemblyInformationalVersion are generated from $(Version) in
+// Directory.Build.props by the GenerateVersionInfo target in the .csproj, so they always
+// match the published package and cannot drift.
 [assembly: AssemblyVersion("2.4.0.0")]
-[assembly: AssemblyFileVersion("2.4.0.0")]

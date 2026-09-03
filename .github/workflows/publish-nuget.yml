@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  VERSION: 4.0.${{ github.run_number }}
-
 jobs:
   publish:
     runs-on: windows-latest
@@ -23,7 +20,11 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          # NetCoreExtension multi-targets net8.0/net9.0/net10.0; the 10.0 SDK is
+          # required to build the net10.0 target and can build the older ones too.
+          dotnet-version: |
+            9.0.x
+            10.0.x
 
       - name: Setup NuGet
         uses: nuget/setup-nuget@v2
@@ -36,6 +37,24 @@ jobs:
 
       - name: Restore packages (packages.config projects)
         run: nuget restore BirSignExtension.sln
+
+      # packages.config does not resolve transitive dependencies, so a version bump
+      # can silently leave a new dependency uninstalled. That builds fine and only
+      # fails at run time, often as a misleading error. Fail the build instead.
+      - name: Verify packages.config dependency closure
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-PackageDependencies.ps1
+
+      # ------------------------------------------------------------------
+      # All three packages take their version from <Version> in
+      # Directory.Build.props, so a local `dotnet pack` / `PackNuspec`
+      # produces exactly what this job publishes. Bump that value to cut a
+      # release; a version that is already on nuget.org is skipped below.
+      # ------------------------------------------------------------------
+      - name: Report version being published
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).SelectSingleNode('//Version').InnerText
+          Write-Host "Publishing version $version"
+          "## Publishing NuGet version ``$version``" >> $env:GITHUB_STEP_SUMMARY
 
       # ------------------------------------------------------------------
       # NuGet Trusted Publishing: exchange a short-lived GitHub OIDC token
@@ -52,7 +71,7 @@ jobs:
       # 1. SharedKernel – must be published first (dependency of both)
       # ------------------------------------------------------------------
       - name: Pack SharedKernel
-        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
+        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore
 
       - name: Publish SharedKernel to NuGet
         run: |
@@ -61,10 +80,10 @@ jobs:
           }
 
       # ------------------------------------------------------------------
-      # 2. NetCoreExtension (.NET 9 / SDK-style)
+      # 2. NetCoreExtension (.NET 8 | 9 | 10 / SDK-style)
       # ------------------------------------------------------------------
       - name: Pack NetCoreExtension
-        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore -p:Version=${{ env.VERSION }}
+        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore
 
       - name: Publish NetCoreExtension to NuGet
         run: |
@@ -76,12 +95,10 @@ jobs:
       # 3. NetFrameworkExtension (.NET Framework 4.8 / nuspec)
       # ------------------------------------------------------------------
       - name: Pack NetFrameworkExtension
-        working-directory: src/NetFrameworkExtension
-        run: nuget pack -Build -Properties "Configuration=Release" -Version ${{ env.VERSION }}
+        run: msbuild src/NetFrameworkExtension/NetFrameworkExtension.csproj -t:PackNuspec -p:Configuration=Release
 
       - name: Publish NetFrameworkExtension to NuGet
-        working-directory: src/NetFrameworkExtension
         run: |
-          Get-ChildItem *.nupkg | ForEach-Object {
+          Get-ChildItem src/NetFrameworkExtension/bin/Release/*.nupkg | ForEach-Object {
             nuget push $_.FullName -ApiKey ${{ steps.nuget_login.outputs.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
           }
