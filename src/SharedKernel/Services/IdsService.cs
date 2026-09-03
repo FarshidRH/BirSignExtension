@@ -67,9 +67,15 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
         /// Sends a user registration request to the remote API asynchronously.
         /// </summary>
         /// <param name="userRequest">The user registration details to be sent. Cannot be null.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse object with the
-        /// API's response as a string.</returns>
-        public async Task<string> SendUsersAsync(UserRequest userRequest)
+        /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse
+        /// carrying the API's message on success, or a description of the failure.</returns>
+        /// <remarks>
+        /// The registration endpoint reports failure differently from the rest of the API: it answers
+        /// with an HTTP error status and a problem+json body, where SendRoles answers HTTP 200 with
+        /// <see cref="ApiReponse{T}.IsSuccess"/> set to false. Both shapes are normalized here so a
+        /// caller only has to read <see cref="ApiReponse{T}.IsSuccess"/>.
+        /// </remarks>
+        public async Task<ApiReponse<string>> SendUsersAsync(UserRequest userRequest)
         {
             var requestUri = $"{_birSignApiUri.TrimEnd('/')}/Api/ManageUsersApi/Register";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -81,7 +87,7 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _httpClient.SendAsync(request);
-            return await response.Content.ReadAsStringAsync();
+            return await ReadApiResponseAsync(response);
         }
 
         /// <summary>
@@ -102,14 +108,159 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _httpClient.SendAsync(request);
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ApiReponse<string>>(content);
+            return await ReadApiResponseAsync(response);
         }
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
+
+        /// <summary>
+        /// Turns a response from the user or role endpoints into an <see cref="ApiReponse{T}"/>,
+        /// whether it arrived as the API's own envelope or as a problem+json error.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="JsonOptions"/> is not optional here. The API serializes camelCase, and
+        /// System.Text.Json matches property names case-sensitively by default, so deserializing
+        /// without it produces an envelope whose Error is null and whose IsSuccess keeps its
+        /// initializer value of true — a failure that reads as a success.
+        /// </remarks>
+        private static async Task<ApiReponse<string>> ReadApiResponseAsync(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiReponse<string>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Error = DescribeFailure(response, content),
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                try
+                {
+                    var envelope = JsonSerializer.Deserialize<ApiReponse<string>>(content, JsonOptions);
+                    if (envelope != null)
+                    {
+                        return envelope;
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Not the API's envelope; fall through and hand the caller the raw body.
+                }
+            }
+
+            return new ApiReponse<string> { Data = content, IsSuccess = true, Error = null };
+        }
+
+        /// <summary>
+        /// Builds a one-line description of a failed response, reading problem+json when the body
+        /// is one and falling back to the raw body otherwise.
+        /// </summary>
+        private static string DescribeFailure(HttpResponseMessage response, string content)
+        {
+            var status = (int)response.StatusCode;
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return $"{status}: {response.ReasonPhrase}";
+            }
+
+            try
+            {
+                using (var document = JsonDocument.Parse(content))
+                {
+                    var root = document.RootElement;
+                    if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        var parts = new List<string>();
+
+                        JsonElement detail;
+                        JsonElement title;
+                        if (root.TryGetProperty("detail", out detail) && detail.ValueKind == JsonValueKind.String)
+                        {
+                            parts.Add(detail.GetString());
+                        }
+                        else if (root.TryGetProperty("title", out title) && title.ValueKind == JsonValueKind.String)
+                        {
+                            parts.Add(title.GetString());
+                        }
+
+                        JsonElement errors;
+                        if (root.TryGetProperty("errors", out errors))
+                        {
+                            var described = new List<string>();
+                            DescribeErrors(errors, null, described);
+                            if (described.Count > 0)
+                            {
+                                parts.Add(string.Join("; ", described));
+                            }
+                        }
+
+                        if (parts.Count > 0)
+                        {
+                            return $"{status}: {string.Join(" - ", parts)}";
+                        }
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                // Not JSON at all; the raw body below is the most useful thing we have.
+            }
+
+            return $"{status}: {content}";
+        }
+
+        /// <summary>
+        /// Flattens the "errors" member of a problem+json body into readable messages.
+        /// </summary>
+        /// <remarks>
+        /// The endpoints put three different things there: a plain string array from the identity
+        /// service, an array of IdentityError objects from a failed registration, and the
+        /// field-to-messages map ValidationProblem produces. All three are handled.
+        /// </remarks>
+        private static void DescribeErrors(JsonElement errors, string field, List<string> messages)
+        {
+            switch (errors.ValueKind)
+            {
+                case JsonValueKind.String:
+                    var text = errors.GetString();
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        messages.Add(string.IsNullOrEmpty(field) ? text : $"{field}: {text}");
+                    }
+                    break;
+
+                case JsonValueKind.Array:
+                    foreach (var item in errors.EnumerateArray())
+                    {
+                        DescribeErrors(item, field, messages);
+                    }
+                    break;
+
+                case JsonValueKind.Object:
+                    JsonElement description;
+                    if (errors.TryGetProperty("description", out description)
+                        && description.ValueKind == JsonValueKind.String)
+                    {
+                        DescribeErrors(description, field, messages);
+                        break;
+                    }
+
+                    foreach (var member in errors.EnumerateObject())
+                    {
+                        DescribeErrors(member.Value, member.Name, messages);
+                    }
+                    break;
+            }
+        }
 
         /// <summary>
         /// Retrieves the department tree structure from the remote API asynchronously.

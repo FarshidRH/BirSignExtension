@@ -77,7 +77,7 @@ namespace MvcNetCore.Controllers
             };
 
             var result = await _idsService.SendUsersAsync(userRequest);
-            return Content(result);
+            return Json(result);
         }
     }
 }

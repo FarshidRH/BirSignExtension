@@ -103,7 +103,7 @@ namespace MvcNetFramework.Controllers
             };
 
             var result = await _idsService.SendUsersAsync(userRequest);
-            return Content(result, "application/json");
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         protected override void Dispose(bool disposing)

@@ -32,8 +32,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
             var options = GetDefaultOpenIdConnectAuthenticationOptions(manageUser);
             optionsConfigurator?.Invoke(options);
 
-            BirSignSettings.Authority = options.Authority;
-            BirSignSettings.RegisterUri = $"{options.Authority.TrimEnd('/')}/Account/Register";
+            BirSignSettings.SetAuthority(options.Authority);
 
             AntiForgeryConfig.UniqueClaimTypeIdentifier = options.TokenValidationParameters.NameClaimType;
             app.SetDefaultSignInAsAuthenticationType(DefaultAuthenticationTypes.ApplicationCookie);
