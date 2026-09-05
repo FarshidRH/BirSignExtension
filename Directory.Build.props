@@ -9,7 +9,7 @@
     exists on nuget.org.
   -->
   <PropertyGroup Label="Versioning">
-    <Version>5.1.0</Version>
+    <Version>5.2.0</Version>
   </PropertyGroup>
 
 </Project>

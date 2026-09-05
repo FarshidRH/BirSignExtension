@@ -70,10 +70,10 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains an ApiReponse
         /// carrying the API's message on success, or a description of the failure.</returns>
         /// <remarks>
-        /// The registration endpoint reports failure differently from the rest of the API: it answers
-        /// with an HTTP error status and a problem+json body, where SendRoles answers HTTP 200 with
-        /// <see cref="ApiReponse{T}.IsSuccess"/> set to false. Both shapes are normalized here so a
-        /// caller only has to read <see cref="ApiReponse{T}.IsSuccess"/>.
+        /// Read <see cref="ApiReponse{T}.IsSuccess"/>, not the HTTP status. Current BirSign answers
+        /// this endpoint with the same envelope as SendRoles; deployments from before that change
+        /// answer a failure with an HTTP error status and a problem+json body instead, and both
+        /// shapes are normalized here.
         /// </remarks>
         public async Task<ApiReponse<string>> SendUsersAsync(UserRequest userRequest)
         {
@@ -118,7 +118,9 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
 
         /// <summary>
         /// Turns a response from the user or role endpoints into an <see cref="ApiReponse{T}"/>,
-        /// whether it arrived as the API's own envelope or as a problem+json error.
+        /// whether it arrived as the API's own envelope or as a problem+json error. The envelope
+        /// is what BirSign sends today; problem+json is still read so an older deployment reports
+        /// its failures rather than looking like an unparseable success.
         /// </summary>
         /// <remarks>
         /// <see cref="JsonOptions"/> is not optional here. The API serializes camelCase, and
@@ -388,6 +390,18 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
             return JsonSerializer.Deserialize<ApiReponse<List<UserPositionApiDto>>>(content, JsonOptions);
         }
 
+        /// <summary>
+        /// Fetches a client-credentials access token for one scope.
+        /// </summary>
+        /// <exception cref="HttpRequestException">
+        /// The token endpoint refused the request, with the OAuth error it gave in the message.
+        /// </exception>
+        /// <remarks>
+        /// The refusal is described rather than reported as a bare status because the most common
+        /// cause reads as something else entirely: a client that has not been allowed the scope,
+        /// or a scope that does not exist on that BirSign at all, comes back as a plain 400 that a
+        /// caller would otherwise log as "BirSign could not be reached".
+        /// </remarks>
         public async Task<string> GetAccessTokenAsync(string scope)
         {
             var parameters = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -400,10 +414,54 @@ namespace MapIdeaHub.BirSign.SharedKernel.Services
 
             var requestUri = $"{_authorityUri.TrimEnd('/')}/connect/token";
             var response = await _httpClient.PostAsync(requestUri, parameters);
-            response.EnsureSuccessStatusCode();
 
-            var content = await response.Content.ReadAsStreamAsync();
-            return (await JsonObject.ParseAsync(content))["access_token"].ToString();
+            var body = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(
+                    $"The token endpoint refused scope '{scope}': {DescribeTokenError(response, body)}");
+            }
+
+            return JsonNode.Parse(body)["access_token"].ToString();
+        }
+
+        /// <summary>Reads the error out of a refused token response, per RFC 6749 section 5.2.</summary>
+        private static string DescribeTokenError(HttpResponseMessage response, string body)
+        {
+            var status = (int)response.StatusCode;
+
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                try
+                {
+                    using (var document = JsonDocument.Parse(body))
+                    {
+                        if (document.RootElement.ValueKind == JsonValueKind.Object)
+                        {
+                            JsonElement error;
+                            JsonElement description;
+                            if (document.RootElement.TryGetProperty("error", out error))
+                            {
+                                var text = error.ToString();
+                                if (document.RootElement.TryGetProperty("error_description", out description))
+                                {
+                                    text += " - " + description.ToString();
+                                }
+
+                                return $"{status}: {text}";
+                            }
+                        }
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Not JSON; the raw body below is the most useful thing we have.
+                }
+
+                return $"{status}: {body}";
+            }
+
+            return $"{status}: {response.ReasonPhrase}";
         }
     }
 }
