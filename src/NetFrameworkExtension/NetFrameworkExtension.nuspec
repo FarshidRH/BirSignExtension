@@ -21,9 +21,47 @@
 		<copyright>Copyright © MapIdeaHub 2025</copyright>
 		<tags>sso;netframework;utility;birsign</tags>
 		<readme>README.md</readme>
+		<!--
+			Every package whose types this library compiles against, so installing it is
+			enough to build. Unlike the SDK-style NetCoreExtension, a .nuspec gets no
+			dependency list generated from the project - anything omitted here is simply
+			not installed, and the consumer meets it as an unresolved type or, worse, a
+			FileNotFoundException at the first sign-in.
+
+			Versions are the ones in packages.config, i.e. what the assembly was built
+			and tested against. NuGet treats them as minimums, so a consumer already on a
+			newer 5.x MVC or 4.x OWIN keeps it.
+
+			Transitive dependencies are deliberately not repeated: Microsoft.Owin.Security
+			.OpenIdConnect brings Microsoft.Owin.Security, Microsoft.Owin and Owin, and
+			Microsoft.IdentityModel.Protocols.OpenIdConnect brings Protocols and Tokens.
+			System.Runtime.Caching, used for the back-channel logout revocation list, is a
+			framework assembly on net48 and needs no package.
+		-->
 		<dependencies>
 			<group targetFramework=".NETFramework4.8">
 				<dependency id="MapIdeaHub.BirSign.SharedKernel" version="$version$" />
+
+				<!-- The OIDC handler itself, and the OWIN host it runs under. -->
+				<dependency id="Microsoft.Owin.Security.OpenIdConnect" version="4.2.3" />
+				<dependency id="Microsoft.Owin.Host.SystemWeb" version="4.2.3" />
+
+				<!-- DefaultAuthenticationTypes, used to pick the sign-in cookie. -->
+				<dependency id="Microsoft.AspNet.Identity.Core" version="2.2.4" />
+
+				<!-- BirSignController derives from System.Web.Mvc.Controller, and
+				     AuthenticationExtensions sets System.Web.Helpers.AntiForgeryConfig. -->
+				<dependency id="Microsoft.AspNet.Mvc" version="5.3.0" />
+				<dependency id="Microsoft.AspNet.WebPages" version="3.3.0" />
+
+				<!-- Discovery document, signing keys and logout-token validation. -->
+				<dependency id="Microsoft.IdentityModel.Protocols.OpenIdConnect" version="8.22.0" />
+				<dependency id="System.IdentityModel.Tokens.Jwt" version="8.22.0" />
+
+				<!-- ParHelper builds the pushed authorization request with JObject; the
+				     webhook middleware deserializes events with System.Text.Json. -->
+				<dependency id="Newtonsoft.Json" version="13.0.4" />
+				<dependency id="System.Text.Json" version="10.0.11" />
 			</group>
 		</dependencies>
 	</metadata>
