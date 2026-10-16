@@ -1,14 +1,10 @@
-using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using MapIdeaHub.BirSign.NetCoreExtension;
-using MapIdeaHub.BirSign.SharedKernel;
 using MapIdeaHub.BirSign.SharedKernel.Dtos;
 using Microsoft.AspNetCore.Http;
 
 const string path = "/api/birsign/webhook";
 const string payload = """{"eventType":"DepartmentDeleted","departmentId":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","eventId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"}""";
-const string historicSecret = "legacy-secret-which-is-no-longer-used";
 
 var invocationCount = 0;
 WebhookEvent? lastEvent = null;
@@ -20,13 +16,12 @@ var middleware = new WebhookMiddleware(
         ++invocationCount;
         lastEvent = webhookEvent;
         return Task.CompletedTask;
-    },
-    historicSecret); // Legacy constructor argument must not turn on HMAC validation.
+    });
 
 {
     var request = NewRequest(payload);
     await middleware.InvokeAsync(request);
-    Check(request.Response.StatusCode == StatusCodes.Status200OK, "unsigned webhook accepted despite legacy secret");
+    Check(request.Response.StatusCode == StatusCodes.Status200OK, "unsigned webhook accepted with original public constructor");
     Check(invocationCount == 1, "webhook handler executed once");
     Check(lastEvent is DepartmentDeletedEvent, "polymorphic event contract preserved");
     Check(lastEvent?.EventId == Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "EventId preserved for idempotency");
@@ -76,14 +71,12 @@ var failingMiddleware = new WebhookMiddleware(
     Check(failing.Response.Body.Length == 0, "handler exceptions do not leak details");
 }
 
-// The public legacy helper remains callable, but neither receiver uses it.
-var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(historicSecret)))
-{
-    var signature = "sha256=" + Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes(timestamp + "." + payload))).ToLowerInvariant();
-    Check(WebhookSignature.Verify(historicSecret, timestamp, signature, payload),
-        "public legacy signature helper retained for API compatibility");
-}
+Check(typeof(WebhookMiddleware).GetConstructors().Length == 1 &&
+      typeof(WebhookMiddleware).GetConstructors()[0].GetParameters().Length == 3,
+      "ASP.NET Core WebhookMiddleware retains original three-parameter constructor");
+Check(typeof(WebhookStartupFilter).GetConstructors().Length == 1 &&
+      typeof(WebhookStartupFilter).GetConstructors()[0].GetParameters().Length == 2,
+      "StartupFilter retains original two-parameter constructor");
 Console.WriteLine("ALL UNSIGNED WEBHOOK PROTOCOL TESTS PASSED");
 
 static DefaultHttpContext NewRequest(string payload)

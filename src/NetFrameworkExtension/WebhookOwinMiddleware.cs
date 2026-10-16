@@ -11,10 +11,8 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
     {
         private readonly string _path;
         private readonly Func<WebhookEvent, Task> _handler;
-
-        // Legacy optional secret parameter is kept for public API compatibility and ignored.
         public WebhookOwinMiddleware(OwinMiddleware next, string path,
-            Func<WebhookEvent, Task> handler, string secret = null) : base(next)
+            Func<WebhookEvent, Task> handler) : base(next)
         {
             _path = path;
             _handler = handler;

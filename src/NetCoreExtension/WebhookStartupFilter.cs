@@ -10,10 +10,7 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
     {
         private readonly string _path;
         private readonly Func<IServiceProvider, WebhookEvent, Task> _handler;
-
-        // Legacy optional secret parameter is kept for public API compatibility and ignored.
-        public WebhookStartupFilter(string path, Func<IServiceProvider, WebhookEvent, Task> handler,
-            string? secret = null) // Legacy optional parameter retained for source/binary compatibility; ignored.
+        public WebhookStartupFilter(string path, Func<IServiceProvider, WebhookEvent, Task> handler)
         {
             _path = path;
             _handler = handler;
@@ -23,7 +20,7 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
         {
             return builder =>
             {
-                builder.UseMiddleware<WebhookMiddleware>(_path, _handler, (string?)null);
+                builder.UseMiddleware<WebhookMiddleware>(_path, _handler);
                 next(builder);
             };
         }

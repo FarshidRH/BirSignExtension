@@ -27,15 +27,15 @@
 | ASP.NET MVC (.Net Framework) | نمونه‌ای از اتصال برنامه MVC کلاسیک به بیرساین | [samples/MvcNetFramework](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetFramework) |
 | ASP.NET MVC (.Net Core)      | نمونه‌ای از اتصال پروژه MVC Core به بیرساین          | [samples/MvcNetCore](https://github.com/FarshidRH/BirSignExtension/tree/main/samples/MvcNetCore) |
 
-## 🔔 وب‌هوک‌ها و سازگاری نسخه‌ها
+## 🔔 وب‌هوک‌های بیرساین
 
-ارسال‌کنندهٔ جدید BirSign رویدادها را **بدون امضای HMAC** ارسال می‌کند و هدر `X-BirSign-Event-Id` و فیلد `EventId` در JSON را حفظ می‌کند.
+ارسال‌کنندهٔ بیرساین رویدادهای چارت سازمانی را با `POST` و بدنهٔ JSON ارسال می‌کند. در پروتکل فعلی **نیازی به Secret یا امضای HMAC نیست**؛ مکانیزم آزمایشی امضا پیش از انتشار از کد Extension حذف شده است.
 
-- گیرندهٔ ASP.NET Core و گیرندهٔ .NET Framework در این شاخه نیازی به `BirSign:WebhookSigningSecret` یا `BirSign.WebhookSigningSecret` ندارند. اگر کلیدهای قدیمی در پیکربندی باقی بمانند، نادیده گرفته می‌شوند.
-- امضاهای عمومی `AddBirSignAuthentication` و `UseBirSignAuthentication` تغییری نکرده‌اند. سازنده‌های قدیمی Middleware و کلاس `WebhookSignature` صرفاً برای سازگاری API باقی مانده‌اند و **به معنای فعال بودن تأیید امضا نیستند**.
-- **تغییر رفتاری مهم:** دریافت‌کنندگانی که هنوز نسخهٔ دارای اعتبارسنجی HMAC را با Secret تنظیم‌شده اجرا می‌کنند، پیام بدون امضای سرور جدید را با `401` رد می‌کنند. لازم است بسته/گیرندهٔ آن‌ها به نسخهٔ سازگار ارتقا یابد.
-- مسیر Webhook را به ورودی‌های قابل اعتماد محدود کنید (Reverse Proxy / فایروال). تحویل رویدادها *at-least-once* است؛ `EventId` را برای جلوگیری از پردازش دوباره، در پایگاه داده ثبت کنید.
-- `BirSign:ClientSecret` مربوط به OIDC و API مدیریت است و **نباید حذف شود**؛ تغییر فوق فقط دربارهٔ امضای Webhook است.
+- APIهای قبلی `AddBirSignAuthentication` و `UseBirSignAuthentication` و تنظیمات احراز هویت OIDC **بدون تغییر باقی مانده‌اند**.
+- `WebhookMiddleware`، `WebhookStartupFilter` و `WebhookOwinMiddleware` همان امضاهای سازندهٔ نسخهٔ اصلی را دارند و نیازی به به‌روزرسانی کد سامانه‌های متصل نیست.
+- هدر `X-BirSign-Event-Id` و فیلد `EventId` در JSON برای شناسایی رویداد حفظ شده‌اند. تحویل به روش *at-least-once* است؛ دریافت‌کننده باید پردازش رویداد تکراری را مدیریت کند.
+- به دلیل نبود احراز اصالت Webhook در سطح برنامه، دسترسی مسیر دریافت را در Reverse Proxy یا فایروال به فرستنده‌های مجاز محدود کنید.
+- `BirSign:ClientSecret` مربوط به OIDC و API مدیریت است و **باید همچنان پیکربندی شود**؛ ارتباطی با Webhook ندارد.
 
 برای جزئیات به [راهنمای Webhooks در Wiki](https://github.com/FarshidRH/BirSignExtension/wiki/Webhooks) مراجعه کنید.
 

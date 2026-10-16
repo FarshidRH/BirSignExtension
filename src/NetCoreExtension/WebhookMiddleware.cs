@@ -13,9 +13,8 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
         private readonly string _path;
         private readonly Func<IServiceProvider, WebhookEvent, Task> _handler;
 
-        // Legacy optional secret parameter is kept for public API compatibility and ignored.
         public WebhookMiddleware(RequestDelegate next, string path,
-            Func<IServiceProvider, WebhookEvent, Task> handler, string? secret = null)
+            Func<IServiceProvider, WebhookEvent, Task> handler)
         {
             _next = next;
             _path = path;
