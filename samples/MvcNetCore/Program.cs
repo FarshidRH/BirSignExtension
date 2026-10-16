@@ -44,21 +44,25 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
         {
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Deliveries can be retried with the same EventId. For production,
+            // persist processed EventIds in a unique, transactional inbox.
+            // Upserts below make simple replay cases safe, not exactly-once.
 
             switch (webhookEvent)
             {
                 case DepartmentCreatedEvent deptCreated:
                     {
                         var deptDto = deptCreated.Department;
-                        var dept = new Department
+                        var dept = await dbContext.Departments.FindAsync(deptDto.Id);
+                        if (dept == null)
                         {
-                            Id = deptDto.Id,
-                            Title = deptDto.Title ?? "Unnamed Department",
-                            ParentDepartmentId = deptDto.ParentDepartmentId,
-                            FullName = deptDto.FullName,
-                            Level = deptDto.Level
-                        };
-                        dbContext.Departments.Add(dept);
+                            dept = new Department { Id = deptDto.Id };
+                            dbContext.Departments.Add(dept);
+                        }
+                        dept.Title = deptDto.Title ?? "Unnamed Department";
+                        dept.ParentDepartmentId = deptDto.ParentDepartmentId;
+                        dept.FullName = deptDto.FullName;
+                        dept.Level = deptDto.Level;
                         await dbContext.SaveChangesAsync();
                     }
                     break;
@@ -93,17 +97,18 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
                 case PositionCreatedEvent posCreated:
                     {
                         var posDto = posCreated.Position;
-                        var pos = new Position
+                        var pos = await dbContext.Positions.FindAsync(posDto.Id);
+                        if (pos == null)
                         {
-                            Id = posDto.Id,
-                            Title = posDto.Title ?? "Unnamed Position",
-                            DepartmentId = posDto.DepartmentId,
-                            Description = posDto.Description,
-                            QualificationCriteria = posDto.QualificationCriteria,
-                            PositionType = posDto.PositionType,
-                            Row = posDto.Row
-                        };
-                        dbContext.Positions.Add(pos);
+                            pos = new Position { Id = posDto.Id };
+                            dbContext.Positions.Add(pos);
+                        }
+                        pos.Title = posDto.Title ?? "Unnamed Position";
+                        pos.DepartmentId = posDto.DepartmentId;
+                        pos.Description = posDto.Description;
+                        pos.QualificationCriteria = posDto.QualificationCriteria;
+                        pos.PositionType = posDto.PositionType;
+                        pos.Row = posDto.Row;
                         await dbContext.SaveChangesAsync();
                     }
                     break;
@@ -164,16 +169,17 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
                             await dbContext.SaveChangesAsync();
                         }
 
-                        var up = new UserPosition
+                        var up = await dbContext.UserPositions.FindAsync(upDto.Id);
+                        if (up == null)
                         {
-                            Id = upDto.Id,
-                            UserId = upDto.UserId,
-                            PositionId = upDto.PositionId,
-                            StartDate = upDto.StartDate,
-                            EndDate = upDto.EndDate,
-                            IsActive = upDto.IsActive
-                        };
-                        dbContext.UserPositions.Add(up);
+                            up = new UserPosition { Id = upDto.Id };
+                            dbContext.UserPositions.Add(up);
+                        }
+                        up.UserId = upDto.UserId;
+                        up.PositionId = upDto.PositionId;
+                        up.StartDate = upDto.StartDate;
+                        up.EndDate = upDto.EndDate;
+                        up.IsActive = upDto.IsActive;
                         await dbContext.SaveChangesAsync();
                     }
                     break;

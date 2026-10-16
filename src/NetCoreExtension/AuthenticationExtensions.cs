@@ -192,7 +192,7 @@ public static class AuthenticationExtensions
 
         if (webhookHandler != null && !string.IsNullOrEmpty(webhookUrl))
         {
-            services.AddSingleton<Microsoft.AspNetCore.Hosting.IStartupFilter>(new WebhookStartupFilter(webhookUrl, webhookHandler, configuration["BirSign:WebhookSigningSecret"]));
+            services.AddSingleton<Microsoft.AspNetCore.Hosting.IStartupFilter>(new WebhookStartupFilter(webhookUrl, webhookHandler));
         }
 
         return services;

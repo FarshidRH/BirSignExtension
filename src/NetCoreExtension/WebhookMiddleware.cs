@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using MapIdeaHub.BirSign.SharedKernel;
 using MapIdeaHub.BirSign.SharedKernel.Dtos;
 using Microsoft.AspNetCore.Http;
 
@@ -13,15 +12,14 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
         private readonly RequestDelegate _next;
         private readonly string _path;
         private readonly Func<IServiceProvider, WebhookEvent, Task> _handler;
-        private readonly string? _secret;
 
+        // Legacy optional secret parameter is kept for public API compatibility and ignored.
         public WebhookMiddleware(RequestDelegate next, string path,
             Func<IServiceProvider, WebhookEvent, Task> handler, string? secret = null)
         {
             _next = next;
             _path = path;
             _handler = handler;
-            _secret = secret;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -48,14 +46,6 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
                 return;
             }
 
-            // For existing clients signature verification is opt-in through configuration.
-            if (!string.IsNullOrWhiteSpace(_secret) &&
-                !WebhookSignature.Verify(_secret, context.Request.Headers["X-BirSign-Timestamp"],
-                    context.Request.Headers["X-BirSign-Signature"], body))
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return;
-            }
 
             WebhookEvent? @event;
             try

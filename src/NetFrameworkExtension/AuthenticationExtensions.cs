@@ -39,7 +39,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
 
             if (webhookHandler != null && !string.IsNullOrEmpty(webhookUrl))
             {
-                app.Use<WebhookOwinMiddleware>(webhookUrl, webhookHandler, System.Configuration.ConfigurationManager.AppSettings["BirSign.WebhookSigningSecret"]);
+                app.Use<WebhookOwinMiddleware>(webhookUrl, webhookHandler, (string)null);
             }
 
             app.UseOpenIdConnectAuthentication(options);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MapIdeaHub.BirSign.SharedKernel
 {
-    /// <summary>Wire protocol shared by the ASP.NET Core and OWIN webhook receivers.</summary>
+    /// <summary>Legacy HMAC helper retained for API compatibility. BirSign no longer sends signatures and receivers no longer verify them.</summary>
     public static class WebhookSignature
     {
         public static bool Verify(string secret, string timestamp, string signature, string body)

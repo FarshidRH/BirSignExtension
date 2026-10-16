@@ -1,4 +1,3 @@
-using MapIdeaHub.BirSign.SharedKernel;
 using MapIdeaHub.BirSign.SharedKernel.Dtos;
 using Microsoft.Owin;
 using System;
@@ -12,14 +11,13 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
     {
         private readonly string _path;
         private readonly Func<WebhookEvent, Task> _handler;
-        private readonly string _secret;
 
+        // Legacy optional secret parameter is kept for public API compatibility and ignored.
         public WebhookOwinMiddleware(OwinMiddleware next, string path,
             Func<WebhookEvent, Task> handler, string secret = null) : base(next)
         {
             _path = path;
             _handler = handler;
-            _secret = secret;
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -44,13 +42,7 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                 context.Response.StatusCode = 413;
                 return;
             }
-            if (!string.IsNullOrWhiteSpace(_secret) &&
-                !WebhookSignature.Verify(_secret, context.Request.Headers.Get("X-BirSign-Timestamp"),
-                    context.Request.Headers.Get("X-BirSign-Signature"), body))
-            {
-                context.Response.StatusCode = 401;
-                return;
-            }
+
 
             WebhookEvent @event;
             try
