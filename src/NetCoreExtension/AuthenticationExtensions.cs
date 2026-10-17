@@ -28,7 +28,7 @@ public static class AuthenticationExtensions
     /// <param name="manageUser">Optional function to manage user creation or updates upon successful authentication.</param>
     /// <param name="optionsConfigurator">Optional action to further customize OpenIdConnectOptions.</param>
     /// <param name="signInScheme">
-    /// The scheme the OpenID Connect handler signs into. Leave null — the default — and this
+    /// The scheme the OpenID Connect handler signs into. Leave null â€” the default â€” and this
     /// method owns the session: it adds its own cookie scheme, points the application's default
     /// schemes at it, and handles back-channel logout there.
     /// <para>
@@ -64,7 +64,7 @@ public static class AuthenticationExtensions
 
         // Publish the register/forgot-password/manage links now rather than from the options
         // callback below. That callback only runs when the options are first resolved, which is
-        // the first challenge — long after a login page needs to render the links.
+        // the first challenge â€” long after a login page needs to render the links.
         BirSignSettings.SetAuthority(authority);
 
         services.AddMemoryCache();

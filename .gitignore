@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /src/SharedKernel/scripts/nuget/_03-nuget-push.bat
 /src/NetCoreExtension/scripts/nuget/_03-nuget-push.bat
 /src/NetFrameworkExtension/scripts/nuget/_03-nuget-push.bat
+/samples/MvcNetCore/appsettings.Development.json

@@ -11,9 +11,8 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
     {
         private readonly string _path;
         private readonly Func<WebhookEvent, Task> _handler;
-
-        public WebhookOwinMiddleware(OwinMiddleware next, string path, Func<WebhookEvent, Task> handler)
-            : base(next)
+        public WebhookOwinMiddleware(OwinMiddleware next, string path,
+            Func<WebhookEvent, Task> handler) : base(next)
         {
             _path = path;
             _handler = handler;
@@ -21,39 +20,51 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context.Request.Path.Value.Equals(_path, StringComparison.OrdinalIgnoreCase) &&
-                context.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    using (var reader = new StreamReader(context.Request.Body))
-                    {
-                        var body = await reader.ReadToEndAsync();
-                        var @event = JsonSerializer.Deserialize<WebhookEvent>(body, new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-
-                        if (@event != null)
-                        {
-                            await _handler(@event);
-                        }
-                    }
-
-                    context.Response.StatusCode = 200;
-                    context.Response.ContentType = "text/plain";
-                    await context.Response.WriteAsync("Success");
-                }
-                catch (Exception ex)
-                {
-                    context.Response.StatusCode = 500;
-                    context.Response.ContentType = "text/plain";
-                    await context.Response.WriteAsync($"Error handling webhook: {ex.Message}");
-                }
-            }
-            else
+            if (!string.Equals(context.Request.Path.Value, _path, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
             {
                 await Next.Invoke(context);
+                return;
+            }
+
+            if (context.Request.ContentLength > 1024 * 1024)
+            {
+                context.Response.StatusCode = 413;
+                return;
+            }
+            string body;
+            using (var reader = new StreamReader(context.Request.Body))
+                body = await reader.ReadToEndAsync();
+            if (body.Length > 1024 * 1024)
+            {
+                context.Response.StatusCode = 413;
+                return;
+            }
+
+
+            WebhookEvent @event;
+            try
+            {
+                @event = JsonSerializer.Deserialize<WebhookEvent>(body,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (@event == null) throw new JsonException("No event");
+            }
+            catch (JsonException)
+            {
+                context.Response.StatusCode = 400;
+                return;
+            }
+
+            try
+            {
+                await _handler(@event);
+                context.Response.StatusCode = 200;
+                context.Response.ContentType = "text/plain";
+                await context.Response.WriteAsync("Success");
+            }
+            catch (Exception)
+            {
+                context.Response.StatusCode = 500;
             }
         }
     }

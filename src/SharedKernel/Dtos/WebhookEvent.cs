@@ -17,6 +17,7 @@ namespace MapIdeaHub.BirSign.SharedKernel.Dtos
     [JsonDerivedType(typeof(UserProfileUpdatedEvent), typeDiscriminator: "UserProfileUpdated")]
     public abstract class WebhookEvent
     {
+        public Guid EventId { get; set; }
         public string EventType { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }

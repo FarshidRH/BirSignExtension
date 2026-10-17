@@ -63,7 +63,9 @@ namespace MvcNetFramework
                     webhookUrl: "/api/birsign/webhook",
                     webhookHandler: async (webhookEvent) =>
                     {
-                        System.Diagnostics.Debug.WriteLine($"[Webhook Received] EventType: {webhookEvent.EventType}, Timestamp: {webhookEvent.Timestamp}");
+                        // BirSign webhook requests are unsigned. Restrict endpoint access at
+                        // the network boundary and persist EventId for idempotent updates.
+                        System.Diagnostics.Debug.WriteLine($"[Webhook Received] EventType: {webhookEvent.EventType}, EventId: {webhookEvent.EventId}, Timestamp: {webhookEvent.Timestamp}");
                         await Task.CompletedTask;
                     });
             }

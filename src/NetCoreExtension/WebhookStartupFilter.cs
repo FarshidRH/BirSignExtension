@@ -10,7 +10,6 @@ namespace MapIdeaHub.BirSign.NetCoreExtension
     {
         private readonly string _path;
         private readonly Func<IServiceProvider, WebhookEvent, Task> _handler;
-
         public WebhookStartupFilter(string path, Func<IServiceProvider, WebhookEvent, Task> handler)
         {
             _path = path;
