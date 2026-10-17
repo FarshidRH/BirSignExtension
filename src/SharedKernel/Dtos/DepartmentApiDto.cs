@@ -10,6 +10,8 @@ namespace MapIdeaHub.BirSign.SharedKernel.Dtos
         public Guid? ParentDepartmentId { get; set; }
         public string FullName { get; set; }
         public int Level { get; set; }
+        // Null when consuming an older BirSign API that did not send this property.
+        public MapIdeaHub.BirSign.SharedKernel.Enums.OrganizationType? OrganizationType { get; set; }
         public List<DepartmentApiDto> Children { get; set; } = new List<DepartmentApiDto>();
     }
 }

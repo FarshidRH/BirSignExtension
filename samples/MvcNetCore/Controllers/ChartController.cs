@@ -58,6 +58,7 @@ namespace MvcNetCore.Controllers
                         title = dept.Title,
                         fullName = dept.FullName ?? dept.Title,
                         level = dept.Level,
+                        organizationType = dept.OrganizationType?.ToString(),
                         nodeType = "department",
                         color = "#3b82f6" // Blue
                     });
@@ -234,7 +235,8 @@ namespace MvcNetCore.Controllers
                 Title = deptDto.Title ?? "Unnamed Department",
                 ParentDepartmentId = parentId,
                 FullName = deptDto.FullName,
-                Level = deptDto.Level
+                Level = deptDto.Level,
+                OrganizationType = deptDto.OrganizationType
             };
             _dbContext.Departments.Add(dept);
             await _dbContext.SaveChangesAsync();

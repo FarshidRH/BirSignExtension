@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <!--
     Single source of truth for the version of all three BirSign packages.
@@ -9,7 +9,7 @@
     exists on nuget.org.
   -->
   <PropertyGroup Label="Versioning">
-    <Version>6.0.2</Version>
+    <Version>6.0.3</Version>
   </PropertyGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿<div dir="rtl">
+<div dir="rtl">
 
 
 # اکستنشن‌های بیرساین (BirSign Extensions)
@@ -48,3 +48,17 @@
 
 </div>
 
+
+## OrganizationType in chart API / webhooks (6.0.3)
+
+DepartmentApiDto.OrganizationType is nullable
+MapIdeaHub.BirSign.SharedKernel.Enums.OrganizationType? with numeric wire values:
+Organization=0, Deputy=1, Department=2, Section=3.
+The API response, nested Children, DepartmentCreated and
+DepartmentUpdated webhooks now carry the field after the BirSign server
+is upgraded. Older extension versions ignore this new JSON property.
+Updated extensions running against an older server see null (not 0):
+do not silently interpret missing values as Organization.
+
+Both ASP.NET Core and .NET Framework consumers use the same SharedKernel
+DTO; upgrade SharedKernel and your applicable extension package to 6.0.3.

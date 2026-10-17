@@ -10,6 +10,7 @@ namespace MvcNetCore.Models
         public Guid? ParentDepartmentId { get; set; }
         public string? FullName { get; set; }
         public int Level { get; set; }
+        public MapIdeaHub.BirSign.SharedKernel.Enums.OrganizationType? OrganizationType { get; set; }
 
         // Navigation properties
         public virtual Department? ParentDepartment { get; set; }

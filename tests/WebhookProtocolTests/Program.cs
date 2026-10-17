@@ -43,6 +43,20 @@ var middleware = new WebhookMiddleware(
     await middleware.InvokeAsync(tooLarge);
     Check(tooLarge.Response.StatusCode == StatusCodes.Status413PayloadTooLarge, "oversized webhook rejected");
 }
+{
+    var withType = NewRequest("""{"eventType":"DepartmentUpdated","department":{"id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","title":"ICT","organizationType":1},"eventId":"cccccccc-cccc-cccc-cccc-cccccccccccc"}""");
+    await middleware.InvokeAsync(withType);
+    Check(lastEvent is DepartmentUpdatedEvent updated &&
+          updated.Department.OrganizationType == MapIdeaHub.BirSign.SharedKernel.Enums.OrganizationType.Deputy,
+          "department webhook deserializes typed organization enum");
+}
+{
+    var fromOldApi = System.Text.Json.JsonSerializer.Deserialize<DepartmentApiDto>(
+        """{"id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","title":"Legacy"}""",
+        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    Check(fromOldApi?.OrganizationType is null,
+        "older API payload without organizationType stays distinguishable from Organization=0");
+}
 var fallback = 0;
 var fallbackMiddleware = new WebhookMiddleware(
     _ => { ++fallback; return Task.CompletedTask; },

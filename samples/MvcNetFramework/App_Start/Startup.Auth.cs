@@ -66,7 +66,13 @@ namespace MvcNetFramework
                         // BirSign webhook requests are unsigned. Restrict endpoint access at
                         // the network boundary and persist EventId for idempotent updates.
                         System.Diagnostics.Debug.WriteLine($"[Webhook Received] EventType: {webhookEvent.EventType}, EventId: {webhookEvent.EventId}, Timestamp: {webhookEvent.Timestamp}");
-                        await Task.CompletedTask;
+                        // Available with SharedKernel 6.0.3+. Older BirSign servers
+                        // do not send organizationType, so it stays null.
+                        var changedDepartment = webhookEvent as MapIdeaHub.BirSign.SharedKernel.Dtos.DepartmentUpdatedEvent;
+                        if (changedDepartment != null && changedDepartment.Department?.OrganizationType != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Department type: {changedDepartment.Department.OrganizationType}");
+                        }                        await Task.CompletedTask;
                     });
             }
         }
