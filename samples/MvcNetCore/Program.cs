@@ -2,7 +2,6 @@ using MapIdeaHub.BirSign.NetCoreExtension;
 using MapIdeaHub.BirSign.NetCoreExtension.Models;
 using MapIdeaHub.BirSign.SharedKernel.Dtos;
 using MapIdeaHub.BirSign.SharedKernel.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,9 +24,6 @@ builder.Services
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // localhost cookies are shared across ports (MVC, BirSign STS, Admin UI).
-    // Give this sample a distinct cookie name to avoid overwriting STS sessions.
-    options.Cookie.Name = ".BirSign.MvcNetCore.Identity";
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -37,9 +33,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
-
-builder.Services.ConfigureExternalCookie(options =>
-    options.Cookie.Name = ".BirSign.MvcNetCore.External");
 
 if (BirSignSettings.IsUseBirSign(builder.Configuration))
 {
@@ -272,13 +265,6 @@ if (BirSignSettings.IsUseBirSign(builder.Configuration))
     });
 }
 
-// The BirSign extension uses the "Cookies" scheme for its own OIDC session.
-// ASP.NET Core's default name (.AspNetCore.Cookies) collides with other
-// localhost applications regardless of their port. Do not rename the scheme:
-// only isolate this sample's cookie name.
-builder.Services.Configure<CookieAuthenticationOptions>(
-    CookieAuthenticationDefaults.AuthenticationScheme,
-    options => options.Cookie.Name = ".BirSign.MvcNetCore.Sso");
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
