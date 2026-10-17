@@ -27,7 +27,10 @@ namespace MapIdeaHub.BirSign.NetFrameworkExtension
                 return;
             }
 
-            if (context.Request.ContentLength > 1024 * 1024)
+            // Katana IOwinRequest exposes Content-Length through Headers, not as a property.
+            // A missing or malformed header is handled by the body-size check below.
+            var declaredLength = context.Request.Headers.Get("Content-Length");
+            if (long.TryParse(declaredLength, out var contentLength) && contentLength > 1024 * 1024)
             {
                 context.Response.StatusCode = 413;
                 return;

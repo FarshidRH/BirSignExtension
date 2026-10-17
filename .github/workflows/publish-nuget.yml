@@ -57,6 +57,21 @@ jobs:
           "## Publishing NuGet version ``$version``" >> $env:GITHUB_STEP_SUMMARY
 
       # ------------------------------------------------------------------
+      # Validate and pack ALL packages before obtaining credentials or
+      # pushing any package. A failed legacy .NET Framework compile must
+      # not leave only the first two packages published.
+      # ------------------------------------------------------------------
+
+      - name: Pack SharedKernel
+        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore
+
+      - name: Pack NetCoreExtension
+        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore
+
+      - name: Pack NetFrameworkExtension
+        run: msbuild src/NetFrameworkExtension/NetFrameworkExtension.csproj -t:PackNuspec -p:Configuration=Release
+
+      # ------------------------------------------------------------------
       # NuGet Trusted Publishing: exchange a short-lived GitHub OIDC token
       # for a temporary nuget.org API key (valid ~1 hour). Requested once
       # here and reused for all three pushes below.
@@ -70,8 +85,6 @@ jobs:
       # ------------------------------------------------------------------
       # 1. SharedKernel – must be published first (dependency of both)
       # ------------------------------------------------------------------
-      - name: Pack SharedKernel
-        run: dotnet pack src/SharedKernel/SharedKernel.csproj -c Release --no-restore
 
       - name: Publish SharedKernel to NuGet
         run: |
@@ -82,8 +95,6 @@ jobs:
       # ------------------------------------------------------------------
       # 2. NetCoreExtension (.NET 8 | 9 | 10 / SDK-style)
       # ------------------------------------------------------------------
-      - name: Pack NetCoreExtension
-        run: dotnet pack src/NetCoreExtension/NetCoreExtension.csproj -c Release --no-restore
 
       - name: Publish NetCoreExtension to NuGet
         run: |
@@ -94,8 +105,6 @@ jobs:
       # ------------------------------------------------------------------
       # 3. NetFrameworkExtension (.NET Framework 4.8 / nuspec)
       # ------------------------------------------------------------------
-      - name: Pack NetFrameworkExtension
-        run: msbuild src/NetFrameworkExtension/NetFrameworkExtension.csproj -t:PackNuspec -p:Configuration=Release
 
       - name: Publish NetFrameworkExtension to NuGet
         run: |
